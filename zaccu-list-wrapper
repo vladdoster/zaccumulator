@@ -1,21 +1,21 @@
 emulate -LR zsh
 
-_zz_wrapper_has_terminfo=0
+_zaccu_wrapper_has_terminfo=0
 
 zmodload zsh/curses
-zmodload zsh/terminfo 2>/dev/null && _zz_wrapper_has_terminfo=1
+zmodload zsh/terminfo 2>/dev/null && _zaccu_wrapper_has_terminfo=1
 
-trap "_zz_wrapper_on_exit" EXIT
+trap "_zaccu_wrapper_on_exit" EXIT
 
-autoload zz-list zz-list-input zz-list-draw
+autoload zaccu-list zaccu-list-input zaccu-list-draw
 
 integer term_height="$LINES"
 integer term_width="$COLUMNS"
 
 # Reason for this function is that on some systems
 # smcup and rmcup are not knowing why left empty
-_zz_wrapper_alternate_screen() {
-    if [ "$_zz_wrapper_has_terminfo" = "1" ]; then
+_zaccu_wrapper_alternate_screen() {
+    if [ "$_zaccu_wrapper_has_terminfo" = "1" ]; then
         [[ "$1" = "1" && -n "$terminfo[smcup]" ]] && return
         [[ "$1" = "0" && -n "$terminfo[rmcup]" ]] && return
     fi
@@ -34,15 +34,15 @@ _zz_wrapper_alternate_screen() {
 }
 
 # Cleanup before any exit
-_zz_wrapper_on_exit() {
-    _zz_wrapper_end
-    _zz_wrapper_alternate_screen 0
-    _zzlist_cursor_visibility "plain" 1
-    unset _zzlist_has_terminfo
+_zaccu_wrapper_on_exit() {
+    _zaccu_wrapper_end
+    _zaccu_wrapper_alternate_screen 0
+    _zacculist_cursor_visibility "plain" 1
+    unset _zacculist_has_terminfo
 }
 
-_zz_wrapper_init_windows() {
-    _zz_wrapper_alternate_screen 1
+_zaccu_wrapper_init_windows() {
+    _zaccu_wrapper_alternate_screen 1
     zcurses init
     zcurses delwin cmd 2>/dev/null
     zcurses delwin main 2>/dev/null
@@ -55,23 +55,23 @@ _zz_wrapper_init_windows() {
     zcurses bg status "+bold" white/black
 }
 
-_zz_wrapper_end() {
+_zaccu_wrapper_end() {
     zcurses init
     zcurses delwin cmd 2>/dev/null
     zcurses delwin main 2>/dev/null
     zcurses end
 }
 
-_zz_wrapper_init_windows
+_zaccu_wrapper_init_windows
 
 zcurses border main
 zcurses border status
 
-zz-list "main" $(( term_height-3 )) $term_width "status" "3" "$term_width" "  Man:  " "1" "$@"
+zaccu-list "main" $(( term_height-3 )) $term_width "status" "3" "$term_width" "  Man:  " "1" "$@"
 
 answer=${reply[REPLY]}
 tmp=( "${(z)answer}" )
-[[ "$ZZLIST_CURRENT_SEGMENT" -gt "${#tmp}" ]] && ZZLIST_CURRENT_SEGMENT="${#tmp}"
-ZZLIST_WRAPPER_BIT=$tmp[ZZLIST_CURRENT_SEGMENT]
+[[ "$ZACCULIST_CURRENT_SEGMENT" -gt "${#tmp}" ]] && ZACCULIST_CURRENT_SEGMENT="${#tmp}"
+ZACCULIST_WRAPPER_BIT=$tmp[ZACCULIST_CURRENT_SEGMENT]
 
 # vim:ft=zsh

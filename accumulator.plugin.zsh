@@ -19,7 +19,7 @@ if [[ -z "$ZPLG_CUR_PLUGIN" && "${fpath[(r)$REPO_DIR]}" != $REPO_DIR ]]; then
     fpath+=( "$REPO_DIR" )
 fi
 
-autoload zz-process-buffer zz-usetty-wrapper zz-list zz-list-input zz-list-draw zz-list-wrapper accu
+autoload zaccu-process-buffer zaccu-usetty-wrapper zaccu-list zaccu-list-input zaccu-list-draw zaccu-list-wrapper accu
 
 mkdir -p "${CONFIG_DIR}/data"
 
