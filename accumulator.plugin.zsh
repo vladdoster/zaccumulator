@@ -27,7 +27,12 @@ trackinghook() {
     local first second
     first="${(q)1}"
     second="${(q)2}"
-    echo "$first $second" >> "${CONFIG_DIR}/data/input.db"
+
+    local newline=$'\n'
+    first="${first//$newline/\\$newline}"
+    second="${second//$newline/\\$newline}"
+
+    print -r -- "$first $second" >> "${CONFIG_DIR}/data/input.db"
 }
 
 autoload add-zsh-hook
