@@ -21,5 +21,17 @@ fi
 
 autoload zz-process-buffer zz-usetty-wrapper zz-list zz-list-input zz-list-draw zz-list-wrapper accu
 
+mkdir -p "${CONFIG_DIR}/data"
+
+trackinghook() {
+    local first second
+    first="${(q)1}"
+    second="${(q)2}"
+    echo "$first $second" >> "${CONFIG_DIR}/data/input.db"
+}
+
+autoload add-zsh-hook
+add-zsh-hook preexec trackinghook
+
 zle -N accu
-bindkey '^F' accu
+bindkey '^B' accu
