@@ -1,98 +1,112 @@
 #
 # Started from zle
-# Displays zaccu-list with manual for the first word on the line
-# Pastes output of zaccu-list into current cursor position
 #
 
-setopt localoptions typesetsilent
+emulate -LR zsh
+setopt typesetsilent
 
 autoload zaccu-process-buffer zaccu-usetty-wrapper zaccu-list zaccu-list-input zaccu-list-draw
 
 local curcontext=":zle:$WIDGET"
 local MATCH MBEGIN MEND i
+local input_db_path="$HOME/.config/accumulator/data/input.db"
+local -a input_arr
 
-# Prepare output variables for zaccu-process-buffer
-local ZACCU_PB_WORDS="" ZACCU_PB_WORDS_BEGINNINGS="" ZACCU_PB_SPACES=""
-local ZACCU_PB_SELECTED_WORD="" ZACCU_PB_LEFT="" ZACCU_PB_RIGHT=""
+input_arr=( "${(f)$(<"${input_db_path}")}" )
 
-# Process current buffer
-zaccu-process-buffer "$BUFFER"
+for entry in "${input_arr[@]}"; do
+    # Prepare output variables for zaccu-process-buffer
+    local ZACCU_PB_WORDS="" ZACCU_PB_WORDS_BEGINNINGS="" ZACCU_PB_SPACES=""
+    local ZACCU_PB_SELECTED_WORD="" ZACCU_PB_LEFT="" ZACCU_PB_RIGHT=""
 
-# Select command for man
-integer i size="${#ZACCU_PB_WORDS}"
-local cmd=""
-for (( i=1; i<=size; i++ )); do
-    [ "$cmd" = "" ] && cmd="${ZACCU_PB_WORDS[i]}"
-    [ "$i" = "$ZACCU_PB_SELECTED_WORD" ] && break
-    [ "$ZACCU_PB_WORDS[i]" = ";" ] && cmd=""
+    echo "$entry"
+
+    # Select last command in the input lines
+    integer i size="${#ZACCU_PB_WORDS}"
+    local cmd=""
+    for (( i=1; i<=size; i++ )); do
+        [ "$cmd" = "" ] && cmd="${ZACCU_PB_WORDS[i]}"
+        [ "$i" = "$ZACCU_PB_SELECTED_WORD" ] && break
+        [ "$ZACCU_PB_WORDS[i]" = ";" ] && cmd=""
+    done
 done
 
 local ZACCULIST_WRAPPER_BIT=""
 zaccu-usetty-wrapper zaccu-list-wrapper ${(f)"$( man "$cmd" | col -b )"}
 
-#
-# Rebuilding buffer
-#
+# If BUFFER isn't empty, we will replace active
+# word under cursor (or just insert when not at
+# word) with selected entity
+if [ -n "$BUFFER" ]; then
+    # Process current buffer
+    local ZACCU_PB_WORDS="" ZACCU_PB_WORDS_BEGINNINGS="" ZACCU_PB_SPACES=""
+    local ZACCU_PB_SELECTED_WORD="" ZACCU_PB_LEFT="" ZACCU_PB_RIGHT=""
+    zaccu-process-buffer "$BUFFER"
 
-integer pos="$CURSOR"
-integer size="${#ZACCU_PB_WORDS}"
-integer newcursor
-buf=""
+    #
+    # Rebuilding buffer
+    #
 
-zle kill-buffer
+    integer pos="$CURSOR"
+    integer size="${#ZACCU_PB_WORDS}"
+    integer newcursor
+    buf=""
 
-integer i j
-for (( i=1; i<=size; i++ )); do
-    # Check if we're at (i.e. directly at or after,
-    # when after are just spaces) current word
-    if [ "$i" = "$ZACCU_PB_SELECTED_WORD" ]; then
-        # Check if we're at the word itself,
-        # or at some distance after it
-        if (( pos > (ZACCU_PB_WORDS_BEGINNINGS[i] + ${#ZACCU_PB_WORDS[i]} - 1) )); then
-            # We need to introduce new word
-            # First move all words and spaces forward
-            for (( j=size; j>=i+1; j-- )); do
-                ZACCU_PB_WORDS[j+1]="${ZACCU_PB_WORDS[j]}"
-                ZACCU_PB_SPACES[j+1]="${ZACCU_PB_SPACES[j]}"
-                ZACCU_PB_WORDS_BEGINNINGS[j+1]="${ZACCU_PB_WORDS_BEGINNINGS[j]}"
-            done
-            size+=1
+    zle kill-buffer
 
-            # New word is introduced at position i+1, after current word
-            # It doesn't have word beginnings and spaces assigned
-            # It has to take spaces from word next to it, i+2
-            ZACCU_PB_WORDS[i+1]="$ZACCULIST_WRAPPER_BIT"
-            ZACCU_PB_WORDS_BEGINNINGS[i+1]="$(( pos + 1 ))"
+    integer i j
+    for (( i=1; i<=size; i++ )); do
+        # Check if we're at (i.e. directly at or after,
+        # when after are just spaces) current word
+        if [ "$i" = "$ZACCU_PB_SELECTED_WORD" ]; then
+            # Check if we're at the word itself,
+            # or at some distance after it
+            if (( pos > (ZACCU_PB_WORDS_BEGINNINGS[i] + ${#ZACCU_PB_WORDS[i]} - 1) )); then
+                # We need to introduce new word
+                # First move all words and spaces forward
+                for (( j=size; j>=i+1; j-- )); do
+                    ZACCU_PB_WORDS[j+1]="${ZACCU_PB_WORDS[j]}"
+                    ZACCU_PB_SPACES[j+1]="${ZACCU_PB_SPACES[j]}"
+                    ZACCU_PB_WORDS_BEGINNINGS[j+1]="${ZACCU_PB_WORDS_BEGINNINGS[j]}"
+                done
+                size+=1
 
-            # Now split spaces
-            # cursor_spaces: spaces from current word to the cursor
-            integer cursor_spaces=$(( pos - ZACCU_PB_WORDS_BEGINNINGS[i] - ${#ZACCU_PB_WORDS[i]} + 1 ))
-            # take that from spaces of word "next" in: current NEW next
-            integer after_spaces=$(( ZACCU_PB_SPACES[i+2] - cursor_spaces ))
-            local empty=""
-            ZACCU_PB_SPACES[i+1]="${(l:cursor_spaces:: :)empty}"
-            ZACCU_PB_SPACES[i+2]="${(l:after_spaces:: :)empty}"
+                # New word is introduced at position i+1, after current word
+                # It doesn't have word beginnings and spaces assigned
+                # It has to take spaces from word next to it, i+2
+                ZACCU_PB_WORDS[i+1]="$ZACCULIST_WRAPPER_BIT"
+                ZACCU_PB_WORDS_BEGINNINGS[i+1]="$(( pos + 1 ))"
 
-            # Cursor will be at end of newly added word
-            newcursor=$(( ZACCU_PB_WORDS_BEGINNINGS[i+1] + ${#ZACCU_PB_WORDS[i+1]} - 1 ))
+                # Now split spaces
+                # cursor_spaces: spaces from current word to the cursor
+                integer cursor_spaces=$(( pos - ZACCU_PB_WORDS_BEGINNINGS[i] - ${#ZACCU_PB_WORDS[i]} + 1 ))
+                # take that from spaces of word "next" in: current NEW next
+                integer after_spaces=$(( ZACCU_PB_SPACES[i+2] - cursor_spaces ))
+                local empty=""
+                ZACCU_PB_SPACES[i+1]="${(l:cursor_spaces:: :)empty}"
+                ZACCU_PB_SPACES[i+2]="${(l:after_spaces:: :)empty}"
 
-        else
-            ZACCU_PB_WORDS[i]="$ZACCULIST_WRAPPER_BIT"
+                # Cursor will be at end of newly added word
+                newcursor=$(( ZACCU_PB_WORDS_BEGINNINGS[i+1] + ${#ZACCU_PB_WORDS[i+1]} - 1 ))
 
-            # Cursor will be at end of newly substituted word
-            newcursor=$(( ZACCU_PB_WORDS_BEGINNINGS[i] + ${#ZACCU_PB_WORDS[i]} - 1 ))
+            else
+                ZACCU_PB_WORDS[i]="$ZACCULIST_WRAPPER_BIT"
 
-            # Update word beginnings of following words – skipped
+                # Cursor will be at end of newly substituted word
+                newcursor=$(( ZACCU_PB_WORDS_BEGINNINGS[i] + ${#ZACCU_PB_WORDS[i]} - 1 ))
+
+                # Update word beginnings of following words – skipped
+            fi
         fi
-    fi
-    buf+="$ZACCU_PB_SPACES[i]$ZACCU_PB_WORDS[i]"
-done
+        buf+="$ZACCU_PB_SPACES[i]$ZACCU_PB_WORDS[i]"
+    done
 
-# Append final white spaces
-buf+="$ZACCU_PB_SPACES[i]"
-BUFFER="$buf"
-CURSOR="$newcursor"
+    # Append final white spaces
+    buf+="$ZACCU_PB_SPACES[i]"
+    BUFFER="$buf"
+    CURSOR="$newcursor"
 
-zle redisplay
+    zle redisplay
+fi
 
 # vim:ft=zsh
