@@ -27,7 +27,7 @@ for (( i=1; i<=size; i++ )); do
     [ "$ZACCU_PB_WORDS[i]" = ";" ] && cmd=""
 done
 
-local ZZLIST_WRAPPER_BIT=""
+local ZACCULIST_WRAPPER_BIT=""
 zaccu-usetty-wrapper zaccu-list-wrapper ${(f)"$( man "$cmd" | col -b )"}
 
 #
@@ -61,7 +61,7 @@ for (( i=1; i<=size; i++ )); do
             # New word is introduced at position i+1, after current word
             # It doesn't have word beginnings and spaces assigned
             # It has to take spaces from word next to it, i+2
-            ZACCU_PB_WORDS[i+1]="$ZZLIST_WRAPPER_BIT"
+            ZACCU_PB_WORDS[i+1]="$ZACCULIST_WRAPPER_BIT"
             ZACCU_PB_WORDS_BEGINNINGS[i+1]="$(( pos + 1 ))"
 
             # Now split spaces
@@ -77,7 +77,7 @@ for (( i=1; i<=size; i++ )); do
             newcursor=$(( ZACCU_PB_WORDS_BEGINNINGS[i+1] + ${#ZACCU_PB_WORDS[i+1]} - 1 ))
 
         else
-            ZACCU_PB_WORDS[i]="$ZZLIST_WRAPPER_BIT"
+            ZACCU_PB_WORDS[i]="$ZACCULIST_WRAPPER_BIT"
 
             # Cursor will be at end of newly substituted word
             newcursor=$(( ZACCU_PB_WORDS_BEGINNINGS[i] + ${#ZACCU_PB_WORDS[i]} - 1 ))
