@@ -25,14 +25,11 @@ mkdir -p "${CONFIG_DIR}/data"
 
 trackinghook() {
     local first second
-    first="${(q)1}"
-    second="${(q)2}"
+    first="${(q)PWD}"
+    second="${(q)1}"
+    third="${(q)2}"
 
-    local newline=$'\n'
-    first="${first//$newline/\\$newline}"
-    second="${second//$newline/\\$newline}"
-
-    print -r -- "$first $second" >> "${CONFIG_DIR}/data/input.db"
+    print -r -- "$first $second $third" >> "${CONFIG_DIR}/data/input.db"
 }
 
 autoload add-zsh-hook
