@@ -7,28 +7,96 @@ setopt typesetsilent
 
 autoload zaccu-process-buffer zaccu-usetty-wrapper zaccu-list zaccu-list-input zaccu-list-draw
 
+##
+## Functions
+##
+
+#
+# Runs initial generators of all loaded plugins.
+# The generators will typically add their header
+# texts into ZACCU_OUTPUT_DOCUMENT_SECTIONS
+#
+function -zaccu_run_initial_generators() {
+    local g
+    for g in ${(v)ZACCU_PLUGS_INITIAL_TEXT_GENERATORS[@]}; do
+        "$g"
+    done
+}
+
+#
+# Runs generator for given command ($2) and its
+# arguments ($3, $4, ...). The generator ran will
+# build ZACCU_OUTPUT_DOCUMENT_SECTIONS sections,
+# i.e. entries of the hash, which are text, with
+# hyperlinks.
+#
+# Requested and used is also $1 - $PWD at the time
+# when the command is being run
+#
+function -zaccu_run_generator() {
+    local active_path="$1" cmd="$2"
+    if [[ -n "$cmd" && -n "${ZACCU_PLUGS_TEXT_GENERATORS[$cmd]}" ]]; then
+        local -a plugins
+        plugins=( "${(@z)ZACCU_PLUGS_TEXT_GENERATORS[$cmd]}" )
+
+        local p
+        for p in "${plugins[@]}"; do
+            "$p" "$@"
+        done
+    fi
+}
+
+##
+## Main code
+##
+
 local curcontext=":zle:$WIDGET"
-local MATCH MBEGIN MEND i
+local MATCH MBEGIN MEND
 local input_db_path="$HOME/.config/accumulator/data/input.db"
 local -a input_arr
 
+# Plugins use this hash to provide content for the output document
+typeset -gA ZACCU_OUTPUT_DOCUMENT_SECTIONS
+ZACCU_OUTPUT_DOCUMENT_SECTIONS=()
+
+-zaccu_run_initial_generators
+
 input_arr=( "${(f)$(<"${input_db_path}")}" )
 
+# TODO: detect active path modification inside one command set
 for entry in "${input_arr[@]}"; do
-    # Prepare output variables for zaccu-process-buffer
-    local ZACCU_PB_WORDS="" ZACCU_PB_WORDS_BEGINNINGS="" ZACCU_PB_SPACES=""
-    local ZACCU_PB_SELECTED_WORD="" ZACCU_PB_LEFT="" ZACCU_PB_RIGHT=""
+    local -a data_pack active_path copy_of_input
+    data_pack=( "${(@z)entry}" )
+    active_path="${(Q)data_pack[1]}"
+    copy_of_input="${(Q)data_pack[2]}"
 
-    echo "$entry"
-
-    # Select last command in the input lines
-    integer i size="${#ZACCU_PB_WORDS}"
+    local -a command_set=( "${(@z)copy_of_input}" )
+    # Select last command in the input
+    integer selected_idx=1 last_idx=1 i size="${#command_set}"
     local cmd=""
     for (( i=1; i<=size; i++ )); do
-        [ "$cmd" = "" ] && cmd="${ZACCU_PB_WORDS[i]}"
-        [ "$i" = "$ZACCU_PB_SELECTED_WORD" ] && break
-        [ "$ZACCU_PB_WORDS[i]" = ";" ] && cmd=""
+        # Look for start of command
+        if [ "$cmd" = "" ]; then
+            cmd="${command_set[i]}"
+            selected_idx=i
+        fi
+
+        # Look for end of command
+        if [ "$command_set[i]" = ";" ]; then
+            last_idx=i-1
+
+            -zaccu_run_generator "$active_path" "${(@)command_set[$selected_idx,$last_idx]}"
+
+            cmd=""
+            selected_idx=0
+            last_idx=0
+        fi
     done
+
+    # Last command, without ";" at the end of it
+    if [[ "$selected_idx" -ne "0" ]]; then
+        -zaccu_run_generator "$active_path" "${(@)command_set[$selected_idx,-1]}"
+    fi
 done
 
 local ZACCULIST_WRAPPER_BIT=""

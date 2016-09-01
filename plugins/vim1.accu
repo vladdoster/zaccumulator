@@ -1,0 +1,68 @@
+# Accumulator plugin for VIM. Commands like "vim ~/.zshrc" are
+# routed to specified generator functions. The generators create
+# text with hyperlinks and appends the text to $SECTIONNAME of
+# choice in ZACCU_OUTPUT_DOCUMENT_SECTIONS[$SECTIONNAME] (global
+# hash).
+
+# Plugin functions are run from "accu" function, which has
+# emulate -LR zsh
+
+#
+# Initial generator
+#
+
+# No arguments
+accu_initial_generator_vim1() {
+    ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]="${C_GREEN}Vim last opened documents:${C_RESET}"$'\n'
+}
+
+#
+# Generator
+#
+
+# $1 - present working directory
+# $2 - it's "vim", the command that's invoked
+# $3, $4, ... - arguments passed to vim
+accu_generator_vim1() {
+    local active_path="$1"
+    local -a args
+    shift 2
+    args=( "$@" )
+
+    local a
+    for a in "${args[@]}"; do
+        # Skip options
+        [[ "$a" = -[[:alnum:]]# ]] && continue
+
+        if [ "$accu_path_occured_vim1[$a]" != "1" ]; then
+            accu_path_occured_vim1[$a]="1"
+            ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$a"$'\n'
+        fi
+    done
+}
+
+#
+# Final generator
+#
+
+accu_final_generator_vim1() {
+    accu_path_occured_vim1=()
+}
+
+#
+# Handler
+#
+
+accu_handler_vim1() {
+}
+
+zaccu_register_plugin "vim" accu_initial_generator_vim1 accu_generator_vim1 accu_final_generator_vim1 accu_handler_vim1
+
+#
+# Helper variables
+#
+
+# Duplicate detector
+typeset -gA accu_path_occured_vim1
+
+# vim: ft=zsh
