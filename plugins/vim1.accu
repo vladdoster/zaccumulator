@@ -14,6 +14,7 @@
 # No arguments
 accu_initial_generator_vim1() {
     ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]="${C_GREEN}Vim last opened documents:${C_RESET}"$'\n'
+    accu_vim1_was_content=0
 }
 
 #
@@ -35,6 +36,7 @@ accu_generator_vim1() {
         [[ "$a" = -[[:alnum:]]# ]] && continue
 
         if [ "$accu_path_occured_vim1[$a]" != "1" ]; then
+            accu_vim1_was_content=1
             accu_path_occured_vim1[$a]="1"
             ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$a"$'\n'
         fi
@@ -47,6 +49,11 @@ accu_generator_vim1() {
 
 accu_final_generator_vim1() {
     accu_path_occured_vim1=()
+
+    # No content -> remove header
+    if (( accu_vim1_was_content == 0 )); then
+        unset 'ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]'
+    fi
 }
 
 #
@@ -64,5 +71,8 @@ zaccu_register_plugin "vim" accu_initial_generator_vim1 accu_generator_vim1 accu
 
 # Duplicate detector
 typeset -gA accu_path_occured_vim1
+
+# Detects whether any content occured
+integer accu_vim1_was_content
 
 # vim: ft=zsh
