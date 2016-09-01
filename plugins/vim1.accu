@@ -7,6 +7,7 @@
 # Plugin functions are run from "accu" function, which has
 # emulate -LR zsh
 
+
 #
 # Initial generator
 #
@@ -16,6 +17,7 @@ accu_initial_generator_vim1() {
     ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]="${C_GREEN}Vim last opened documents:${C_RESET}"$'\n'
     accu_vim1_was_content=0
 }
+
 
 #
 # Generator
@@ -38,10 +40,23 @@ accu_generator_vim1() {
         if [ "$accu_vim1_path_occured[$a]" != "1" ]; then
             accu_vim1_was_content=1
             accu_vim1_path_occured[$a]="1"
-            ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$a"$'\n'
+
+            zaccu_resolve_path "$active_path" "$a"
+            local dir="${reply[1]}" file="${reply[2]}"
+
+            reply=()
+
+            # ID, data1, data2, data3, text, handler
+            zaccu_get_std_button "vim1" 0 "$active_path" "$a" "$file" accu_std_action_vim1
+
+            # ID, data1, data2, data3, text, handler
+            zaccu_get_button "vim1A" 0 "$active_path" "$a" "Backup" accu_action_backup_vim1
+
+            ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$reply[1]"$'\t'"${reply[2]}"$'\n'
         fi
     done
 }
+
 
 #
 # Final generator
@@ -56,14 +71,27 @@ accu_final_generator_vim1() {
     fi
 }
 
+
 #
-# Handler
+# Actions
 #
 
-accu_handler_vim1() {
+accu_std_action_vim1() {
+    echo "Std action"
 }
 
-zaccu_register_plugin "vim" accu_initial_generator_vim1 accu_generator_vim1 accu_final_generator_vim1 accu_handler_vim1
+accu_action_backup_vim1() {
+    echo "Backup action"
+}
+
+
+#
+# Register generators for command "vim", "gvim"
+#
+
+zaccu_register_plugin "vim" accu_initial_generator_vim1 accu_generator_vim1 accu_final_generator_vim1
+zaccu_register_plugin "gvim" accu_initial_generator_vim1 accu_generator_vim1 accu_final_generator_vim1
+
 
 #
 # Helper variables

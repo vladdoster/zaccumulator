@@ -57,13 +57,13 @@ add-zsh-hook preexec trackinghook
 # Initialize infrastructure globals
 #
 
-typeset -gA ZACCU_PLUGS_INITIAL_TEXT_GENERATORS ZACCU_PLUGS_TEXT_GENERATORS
-typeset -gA ZACCU_PLUGS_FINAL_TEXT_GENERATORS ZACCU_PLUGS_LINK_HANDLERS
+typeset -gA ZACCU_PLUGS_INITIAL_TEXT_GENERATORS ZACCU_PLUGS_TEXT_GENERATORS ZACCU_PLUGS_FINAL_TEXT_GENERATORS
+typeset -gA ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS
 
 ZACCU_PLUGS_INITIAL_TEXT_GENERATORS=()
 ZACCU_PLUGS_TEXT_GENERATORS=()
 ZACCU_PLUGS_FINAL_TEXT_GENERATORS=()
-ZACCU_PLUGS_LINK_HANDLERS=()
+ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS=()
 
 #
 # Load plugins
@@ -84,20 +84,62 @@ ZACCU_PLUGS_LINK_HANDLERS=()
 # $4 - name of final generator function - the one that is
 #      run after all calls to above generator are done
 #
-# $5 - name of handler function - the one that knows what
-#      to do with selected link from the document that
-#      is generated from ZACCU_OUTPUT_DOCUMENT_SECTIONS;
-#      standard action of handler should be putting
-#      selected data at prompt with meaningful command
-#      that uses the data
-#
 function zaccu_register_plugin() {
-    local program="$1" initial="$2" generator="$3" final="$4" handler="$5"
+    local program="$1" initial="$2" generator="$3" final="$4"
 
     ZACCU_PLUGS_INITIAL_TEXT_GENERATORS[$program]="$initial"
     ZACCU_PLUGS_TEXT_GENERATORS[$program]="$generator"
     ZACCU_PLUGS_FINAL_TEXT_GENERATORS[$program]="$final"
-    ZACCU_PLUGS_LINK_HANDLERS[$program]="$handler"
+}
+
+
+# Appends hyperlink into "reply" output array. It's the
+# standard action button, shown without surrounding
+# "[" and "]".
+#
+# $1 - action ID
+#
+# $2 - data1, e.g. timestamp
+#
+# $3 - data2, e.g. active path
+#
+# $4 - data3, e.g. file path, file name, URL, other data
+#
+# $5 - text
+#
+# $6 - handler function
+#
+function zaccu_get_std_button() {
+    local id="$1" data1="$2" data2="$3" data3="$4" text="$5"
+    reply+=( "["$'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"${data3}-${text}]" )
+    ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]="$6"
+}
+
+# Appends button hyperlink into "reply" output array
+#
+# Arguments are the same as in zaccu_get_std_button
+#
+function zaccu_get_button() {
+    local id="$1" data1="$2" data2="$3" data3="$4" text="$5"
+    reply+=( "["$'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"${data3}-${text}]" )
+    ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]="$6"
+}
+
+# Resolves absolute path from current working directory and file path
+#
+# $1 - current working directory
+#
+# $2 - file path
+#
+# $reply[1] - dirname
+#
+# $reply[2] - basename
+#
+function zaccu_resolve_path() {
+    reply=()
+    local p="$1/$2"
+    reply[1]="${p:h}"
+    reply[2]="${p:t}"
 }
 
 () {
