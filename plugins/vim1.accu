@@ -35,9 +35,9 @@ accu_generator_vim1() {
         # Skip options
         [[ "$a" = -[[:alnum:]]# ]] && continue
 
-        if [ "$accu_path_occured_vim1[$a]" != "1" ]; then
+        if [ "$accu_vim1_path_occured[$a]" != "1" ]; then
             accu_vim1_was_content=1
-            accu_path_occured_vim1[$a]="1"
+            accu_vim1_path_occured[$a]="1"
             ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$a"$'\n'
         fi
     done
@@ -48,7 +48,7 @@ accu_generator_vim1() {
 #
 
 accu_final_generator_vim1() {
-    accu_path_occured_vim1=()
+    accu_vim1_path_occured=()
 
     # No content -> remove header
     if (( accu_vim1_was_content == 0 )); then
@@ -69,8 +69,8 @@ zaccu_register_plugin "vim" accu_initial_generator_vim1 accu_generator_vim1 accu
 # Helper variables
 #
 
-# Duplicate detector
-typeset -gA accu_path_occured_vim1
+# Detects if a path already occured
+typeset -gA accu_vim1_path_occured
 
 # Detects whether any content occured
 integer accu_vim1_was_content
