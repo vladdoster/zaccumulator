@@ -46,6 +46,20 @@ function -zaccu_run_generator() {
     fi
 }
 
+#
+# Runs final generators of all loaded plugins.
+# The generators will typically remove section's
+# header if there was no content, or e.g. create
+# actual ZACCU_OUTPUT_DOCUMENT_SECTIONS section
+# from data constructed in generators
+#
+function -zaccu_run_final_generators() {
+    local g
+    for g in ${(v)ZACCU_PLUGS_FINAL_TEXT_GENERATORS[@]}; do
+        "$g"
+    done
+}
+
 ##
 ## Main code
 ##
@@ -98,6 +112,8 @@ for entry in "${input_arr[@]}"; do
         -zaccu_run_generator "$active_path" "${(@)command_set[$selected_idx,-1]}"
     fi
 done
+
+-zaccu_run_final_generators
 
 local ZACCULIST_WRAPPER_BIT=""
 zaccu-usetty-wrapper zaccu-list-wrapper ${(f)"$( man "$cmd" | col -b )"}
