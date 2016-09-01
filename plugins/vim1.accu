@@ -1,8 +1,8 @@
 # Accumulator plugin for VIM. Commands like "vim ~/.zshrc" are
-# routed to specified generator functions. The generators create
+# routed to specified generator function. The generator creates
 # text with hyperlinks and appends the text to $SECTIONNAME of
 # choice in ZACCU_OUTPUT_DOCUMENT_SECTIONS[$SECTIONNAME] (global
-# hash).
+# hash). Initial and final generators manage header text.
 
 # Plugin functions are run from "accu" function, which has
 # emulate -LR zsh
