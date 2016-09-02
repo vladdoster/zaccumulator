@@ -115,6 +115,17 @@ done
 
 -zaccu_run_final_generators
 
+local k text=""
+local -a splitted
+integer nonselectable_idx=1
+ZACCULIST_NONSELECTABLE_ELEMENTS=()
+for k in vim1; do
+    ZACCULIST_NONSELECTABLE_ELEMENTS+=( "$nonselectable_idx" )
+    text+="${ZACCU_OUTPUT_DOCUMENT_SECTIONS[$k]}"
+    splitted=( "${(f)ZACCU_OUTPUT_DOCUMENT_SECTIONS[$k]}" )
+    nonselectable_idx+="${#splitted}"
+done
+
 local ZACCULIST_WRAPPER_BIT=""
 zaccu-usetty-wrapper zaccu-list-wrapper ${(f)"$( man "$cmd" | col -b )"}
 
