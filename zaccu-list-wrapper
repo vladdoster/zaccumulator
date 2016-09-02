@@ -67,7 +67,7 @@ _zaccu_wrapper_init_windows
 zcurses border main
 zcurses border status
 
-zaccu-list "main" $(( term_height-3 )) $term_width "status" "3" "$term_width" "  Man:  " "1" "$@"
+zaccu-list "main" $(( term_height-3 )) $term_width "status" "3" "$term_width" "  Accumulated data  " "1" "$@"
 
 answer=${reply[REPLY]}
 tmp=( "${(z)answer}" )
