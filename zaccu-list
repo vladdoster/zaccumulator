@@ -367,10 +367,13 @@ while (( 1 )); do
             disp_list=( "${(@)list[ZACCULIST_FROM_WHAT_IDX_LIST_IS_SHOWN, end_idx]}" )
 
             if [ -n "$colsearch_pattern" ]; then
-                local col=$'\x1b[00;35m' reset=$'\x1b[00;00m'
+                local col=$'\5' reset=$'\25'
                 # The repeat will make the matching work on a fresh heap
                 repeat 1; do
-                    disp_list=( "${(@)disp_list//(#mi)($~colsearch_pattern)/$col${MATCH}$reset}" )
+                    disp_list=( ${(@)disp_list//(#mi)($~colsearch_pattern)/$col${MATCH}$reset} )
+                    # [Mark][Text][Red-Mark][Text2][Close]... -> [Mark][Text][Close][Red-Mark][Text2][Close][Mark]
+                    # I.e. provide [Close] before [Red-Mark] and [Mark] after its [Close]
+                    disp_list=( ${(@)disp_list//(#b)([$'\3'$'\4'$'\5'$'\6'])([^$'\25']#)$'\5'([^$'\25']#)$'\25'/$match[1]$match[2]$'\25'$'\5'$match[3]$'\25'$match[1]} )
                 done
             fi
             # We translate color marks into color codes. list still contains marks,
