@@ -372,8 +372,12 @@ while (( 1 )); do
                 repeat 1; do
                     disp_list=( ${(@)disp_list//(#mi)($~colsearch_pattern)/$col${MATCH}$reset} )
                     # [Mark][Text][Red-Mark][Text2][Close]... -> [Mark][Text][Close][Red-Mark][Text2][Close][Mark]
-                    # I.e. provide [Close] before [Red-Mark] and [Mark] after its [Close]
-                    disp_list=( ${(@)disp_list//(#b)([$'\3'$'\4'$'\5'$'\6'])([^$'\25']#)$'\5'([^$'\25']#)$'\25'/$match[1]$match[2]$'\25'$'\5'$match[3]$'\25'$match[1]} )
+                    # I.e. provide [Close] before [Red-Mark] and [Mark] after red's [Close]
+                    while (( 1 )); do
+                        match=()
+                        disp_list=( ${(@)disp_list//(#b)([$'\3'$'\4'$'\5'$'\6'])([^$'\25']#)$'\5'([^$'\25']#)$'\25'/$match[1]$match[2]$'\25'$'\5'$match[3]$'\25'$match[1]} )
+                        [ -z "${match[1]}" ] && break
+                    done
                 done
             fi
             # We translate color marks into color codes. list still contains marks,
