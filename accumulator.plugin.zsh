@@ -27,15 +27,15 @@ autoload zaccu-process-buffer zaccu-usetty-wrapper zaccu-list zaccu-list-input z
 
 # Available colors to embed in generated text
 C_RED=$'\7'
-C_RED_E=$'\7'
+C_RED_E=$'\25'
 C_GREEN=$'\3'
-C_GREEN_E=$'\3'
+C_GREEN_E=$'\25'
 C_YELLOW=$'\4'
-C_YELLOW_E=$'\4'
+C_YELLOW_E=$'\25'
 C_MAGENTA=$'\5'
-C_MAGENTA_E=$'\5'
+C_MAGENTA_E=$'\25'
 C_CYAN=$'\6'
-C_CYAN_E=$'\6'
+C_CYAN_E=$'\25'
 
 #
 # Set up trackinghook
