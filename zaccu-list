@@ -332,13 +332,19 @@ while (( 1 )); do
             local search_pattern=""
             local colsearch_pattern=""
             if [ -n "$search_buffer" ]; then
-                # Patterns will be *foo*~^*bar* and (foo|bar)
-                search_pattern="${search_buffer// ##/*~^*}"
+                # The base bit of this pattern is ((#s)[^$'\1']#THEWORD*|*$'\2'[^$'\1']#THEWORD*) - the word
+                # occuring not inside hyper link
+                # Pattern will be ((#s)[^$'\1']#FOO*|*$'\2'[^$'\1']#FOO*)~^((#s)[^$'\1']#BAR*|*$'\2'[^$'\1']#BAR*...)
+                # ~^ means: "not those that have not this"
+                search_pattern=${search_buffer//(#b)([^ ]##)/((#s)[^$'\1']#$match[1]*|*$'\2'[^$'\1']#$match[1]*)~^}
+                search_pattern="${search_pattern// ##/}"
+                search_pattern="${search_pattern%\~\^}"
+                # Pattern will be (foo|bar)
                 colsearch_pattern="${search_buffer// ##/|}"
 
                 # The repeat will make the matching work on a fresh heap
                 repeat 1; do
-                    list=( "${(@M)list:#(#i)*$~search_pattern*}" )
+                    list=( "${(@M)list:#(#i)$~search_pattern}" )
                 done
 
                 last_element="$#list"
