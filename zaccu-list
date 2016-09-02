@@ -163,7 +163,7 @@ _zacculist_replace_color_marks_with() {
 _zacculist_mark_current_segment_in_current_element() {
         # Check if current element is in ZACCULIST_NONSELECTABLE_ELEMENTS
         # If yes, don't mark current segment
-        [ "${ZACCULIST_NONSELECTABLE_ELEMENTS[(r)$ZACCULIST_CURRENT_IDX]}" = "$ZACCULIST_CURRENT_IDX" ] && return
+        [[ -z "$ZACCULIST_SEARCH_BUFFER" && "${ZACCULIST_NONSELECTABLE_ELEMENTS[(r)$ZACCULIST_CURRENT_IDX]}" = "$ZACCULIST_CURRENT_IDX" ]] && return
 
         # There will be no colorifying for current element
         integer ZACCULIST_CURRENT_PAGE_IDX=$(( (ZACCULIST_CURRENT_IDX-1)%page_height+1 ))
