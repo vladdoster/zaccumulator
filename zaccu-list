@@ -366,13 +366,12 @@ while (( 1 )); do
                 repeat 1; do
                     disp_list=( "${(@)disp_list//(#mi)($~colsearch_pattern)/$col${MATCH}$reset}" )
                 done
-            else
-                # We translate color marks into color codes. list still contains marks,
-                # and _zacculist_mark_current_segment_in_current_element will be able
-                # to restore current element into marks, to switch colors of active
-                # segment
-                _zacculist_translate_color_marks_in_disp_list
             fi
+            # We translate color marks into color codes. list still contains marks,
+            # and _zacculist_mark_current_segment_in_current_element will be able
+            # to restore current element into marks, to switch colors of active
+            # segment
+            _zacculist_translate_color_marks_in_disp_list
         fi
 
         # We need second disp_list to be able to disable colorifying for particular elements
