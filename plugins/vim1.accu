@@ -44,10 +44,15 @@ accu_generator_vim1() {
             zaccu_resolve_path "$active_path" "$a"
             local dir="${reply[1]}" file="${reply[2]}"
 
+            # Truncate to 25 characters, right-pad to 30 characters
+            file='%25>...>'"$file"
+            file="$C_YELLOW${(%)file}$C_YELLOW_E"
+            file="${(r:30:: :)file}"
+
             reply=()
 
             # ID, data1, data2, data3, text, handler
-            zaccu_get_std_button "vim1" 0 "$active_path" "$a" "$C_YELLOW$file$C_YELLOW_E" accu_std_action_vim1
+            zaccu_get_std_button "vim1" 0 "$active_path" "$a" "$file" accu_std_action_vim1
 
             # ID, data1, data2, data3, text, handler
             zaccu_get_button "vim1A" 0 "$active_path" "$a" "Backup" accu_action_backup_vim1
