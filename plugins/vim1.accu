@@ -55,9 +55,12 @@ accu_generator_vim1() {
             zaccu_get_std_button "vim1" 0 "$active_path" "$a" "$file" accu_std_action_vim1
 
             # ID, data1, data2, data3, text, handler
-            zaccu_get_button "vim1A" 0 "$active_path" "$a" "Backup" accu_action_backup_vim1
+            zaccu_get_button "vim1A" 0 "$active_path" "$a" "CD" accu_action_cd_vim1
 
-            ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$reply[1]"$'\t'"${reply[2]}"$'\n'
+            # ID, data1, data2, data3, text, handler
+            zaccu_get_button "vim1B" 0 "$active_path" "$a" "Backup" accu_action_backup_vim1
+
+            ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$reply[1] ${reply[2]} ${reply[3]}"$'\n'
         fi
     done
 }
@@ -83,6 +86,10 @@ accu_final_generator_vim1() {
 
 accu_std_action_vim1() {
     echo "Std action"
+}
+
+accu_action_cd_vim1() {
+    echo "Cd action"
 }
 
 accu_action_backup_vim1() {
