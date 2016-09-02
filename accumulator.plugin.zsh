@@ -25,15 +25,17 @@ fi
 
 autoload zaccu-process-buffer zaccu-usetty-wrapper zaccu-list zaccu-list-input zaccu-list-draw zaccu-list-wrapper accu
 
-C_RESET=$'\e[0m'
-C_BLACK=$'\e[0;30m'
-C_RED=$'\e[0;31m'
-C_GREEN=$'\e[0;32m'
-C_YELLOW=$'\e[1;33m'
-C_BLUE=$'\e[0;34m'
-C_MAGENTA=$'\e[0;35m'
-C_CYAN=$'\e[0;36m'
-C_WHITE=$'\e[0;37m'
+# Available colors to embed in generated text
+C_RED=$'\7'
+C_RED_E=$'\7'
+C_GREEN=$'\3'
+C_GREEN_E=$'\3'
+C_YELLOW=$'\4'
+C_YELLOW_E=$'\4'
+C_MAGENTA=$'\5'
+C_MAGENTA_E=$'\5'
+C_CYAN=$'\6'
+C_CYAN_E=$'\6'
 
 #
 # Set up trackinghook
@@ -111,7 +113,7 @@ function zaccu_register_plugin() {
 #
 function zaccu_get_std_button() {
     local id="$1" data1="$2" data2="$3" data3="$4" text="$5"
-    reply+=( "["$'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"${data3}-${text}]" )
+    reply+=( $'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"$data3"$'\2'"${text}" )
     ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]="$6"
 }
 
@@ -121,7 +123,7 @@ function zaccu_get_std_button() {
 #
 function zaccu_get_button() {
     local id="$1" data1="$2" data2="$3" data3="$4" text="$5"
-    reply+=( "["$'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"${data3}-${text}]" )
+    reply+=( "["$'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"$data3"$'\2'"${text}]" )
     ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]="$6"
 }
 

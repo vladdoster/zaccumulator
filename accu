@@ -127,7 +127,7 @@ for k in vim1; do
 done
 
 local ZACCULIST_WRAPPER_BIT=""
-zaccu-usetty-wrapper zaccu-list-wrapper ${(f)"$( man "$cmd" | col -b )"}
+zaccu-usetty-wrapper zaccu-list-wrapper "${(@f)text}"
 
 # If BUFFER isn't empty, we will replace active
 # word under cursor (or just insert when not at

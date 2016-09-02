@@ -117,12 +117,15 @@ for (( i=1; i<=end_idx; i++ )); do
         zcurses attr "$win" +"$active_text"
 
         # Mark current segment (surrounded with bells, code \7) with red color
+        local text="$@[i]"
+        text="${text//$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\2'/}"
 
         _zacculist_print_with_ansi "$win" "$text" "$text_offset" "$max_text_len"
 
         zcurses attr "$win" -"$active_text"
     else
-        _zacculist_print_with_ansi "$win" "$@[i]" "$text_offset" "$max_text_len"
+        text="${@[i]//$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\2'/}"
+        _zacculist_print_with_ansi "$win" "$text" "$text_offset" "$max_text_len"
     fi
     zcurses clear "$win" eol
 
