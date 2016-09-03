@@ -76,22 +76,26 @@ __accu_generator_vim1() {
             local dir="${reply[1]}" file="${reply[2]}"
 
             # Truncate to 35 characters, right-pad to 40 characters
-            file='%35<...<'"$file"
-            file="$ACC_YELLOW${(%)file}$ACC_YELLOW_E"
-            file="${(r:40:: :)file}"
+            txtfile='%35<...<'"$file"
+            txtfile="$ACC_YELLOW${(%)file}$ACC_YELLOW_E"
+            txtfile="${(r:40:: :)file}"
 
             reply=()
 
             # ID, data1, data2, data3, data4, text, handler
-            zaccu_get_std_button "vim1" 0 "$cmd" "$active_path" "$a" "$file" __accu_std_action_vim1
+            zaccu_get_std_button "vim1" 0 "$cmd" "$active_path" "$a" "$txtfile" __accu_std_action_vim1
 
             # ID, data1, data2, data3, data4, text, handler
             zaccu_get_button "vim1A" 0 "$cmd" "$active_path" "$a" "CD" __accu_action_cd_vim1
-
-            # ID, data1, data2, data3, data4, text, handler
             zaccu_get_button "vim1B" 0 "$cmd" "$active_path" "$a" "Backup" __accu_action_backup_vim1
 
-            ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$reply[1] ${reply[2]} ${reply[3]}"$'\n'
+            if [[ "${a[1]}" = "/" || "${a[1]}" = "~" ]]; then
+                zaccu_get_button "vim1C" 0 "$cmd" "$dir" "$file" "FileCD" __accu_action_cd_vim1
+            elif [[ "$a" = */* ]]; then
+                zaccu_get_button "vim1C" 0 "$cmd" "$dir" "$file" "FileCD" __accu_action_cd_vim1
+            fi
+
+            ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$reply[1] ${reply[2]} ${reply[3]} ${reply[4]}"$'\n'
         fi
     done
 }
