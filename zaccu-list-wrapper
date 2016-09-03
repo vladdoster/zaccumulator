@@ -69,7 +69,7 @@ zcurses border status
 
 zaccu-list "main" $(( term_height-3 )) $term_width "status" "3" "$term_width" "  Accumulated data  " "1" "$@"
 
-if [ "$REPLY" != "-1" ]; then
+if [[ "$REPLY" != "-1" && "$REPLY" = -(#c0,1)[0-9]## ]]; then
     answer=${reply[REPLY]}
     tmp=( "${(z)answer}" )
     [[ "$ZACCULIST_CURRENT_SEGMENT" -gt "${#tmp}" ]] && ZACCULIST_CURRENT_SEGMENT="${#tmp}"
