@@ -75,10 +75,10 @@ __accu_generator_vim1() {
             zaccu_stdlib_resolve_path "$active_path" "$a"
             local dir="${reply[1]}" file="${reply[2]}"
 
-            # Truncate to 30 characters, right-pad to 35 characters
-            file='%30<...<'"$file"
+            # Truncate to 35 characters, right-pad to 40 characters
+            file='%35<...<'"$file"
             file="$ACC_YELLOW${(%)file}$ACC_YELLOW_E"
-            file="${(r:35:: :)file}"
+            file="${(r:40:: :)file}"
 
             reply=()
 
