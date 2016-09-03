@@ -135,8 +135,17 @@ for entry in "${input_arr[@]}"; do
                 if (( last_idx - selected_idx == 0 )); then
                     active_path="$HOME"
                 elif (( last_idx - selected_idx == 1 )); then
-                    # TODO: CDPATH
-                    [[ "$active_path" != [+-]* ]] && active_path="${command_set[last_idx]}"
+                    if [[ "$active_path" != [+-]* ]]; then
+                        local candidate="${command_set[last_idx]}"
+                        if [ "${candidate[1]}" = "/" ]; then
+                            active_path="$candidate"
+                        elif [ "${candidate[1]}" = "~" ]; then
+                            active_path="${candidate/#\~/$HOME}"
+                        else
+                            # TODO: CDPATH
+                            active_path="$active_path/$candidate"
+                        fi
+                    fi
                 else
                     # Unsupported yet
                 fi
