@@ -45,10 +45,10 @@ accu_generator_vim1() {
             zaccu_resolve_path "$active_path" "$a"
             local dir="${reply[1]}" file="${reply[2]}"
 
-            # Truncate to 25 characters, right-pad to 30 characters
-            file='%25>...>'"$file"
+            # Truncate to 30 characters, right-pad to 35 characters
+            file='%30<...<'"$file"
             file="$C_YELLOW${(%)file}$C_YELLOW_E"
-            file="${(r:30:: :)file}"
+            file="${(r:35:: :)file}"
 
             reply=()
 
