@@ -129,6 +129,10 @@ done
 local ZACCULIST_WRAPPER_BIT=""
 zaccu-usetty-wrapper zaccu-list-wrapper "${(@f)${text%$'\n'}}"
 
+if [ -z "$ZACCULIST_WRAPPER_BIT" ]; then
+    return 1
+fi
+
 if [ -z "$BUFFER" ]; then
     # ID, data1, data2, data3
     if [[ "$ZACCULIST_WRAPPER_BIT" = (#b)*$'\1'([^$'\1']#)$'\1'([^$'\1']#)$'\1'([^$'\1']#)$'\1'([^$'\2']#)$'\2'* ]]; then
@@ -213,5 +217,7 @@ else
 
     zle redisplay
 fi
+
+return 0
 
 # vim:ft=zsh

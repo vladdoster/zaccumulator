@@ -69,9 +69,13 @@ zcurses border status
 
 zaccu-list "main" $(( term_height-3 )) $term_width "status" "3" "$term_width" "  Accumulated data  " "1" "$@"
 
-answer=${reply[REPLY]}
-tmp=( "${(z)answer}" )
-[[ "$ZACCULIST_CURRENT_SEGMENT" -gt "${#tmp}" ]] && ZACCULIST_CURRENT_SEGMENT="${#tmp}"
-ZACCULIST_WRAPPER_BIT=$tmp[ZACCULIST_CURRENT_SEGMENT]
+if [ "$REPLY" != "-1" ]; then
+    answer=${reply[REPLY]}
+    tmp=( "${(z)answer}" )
+    [[ "$ZACCULIST_CURRENT_SEGMENT" -gt "${#tmp}" ]] && ZACCULIST_CURRENT_SEGMENT="${#tmp}"
+    ZACCULIST_WRAPPER_BIT=$tmp[ZACCULIST_CURRENT_SEGMENT]
+else
+    ZACCULIST_WRAPPER_BIT=""
+fi
 
 # vim:ft=zsh
