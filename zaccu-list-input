@@ -137,11 +137,18 @@ case "$key" in
             (( ZACCULIST_CURRENT_SEGMENT = nseg - 1 ))
             [ "$ZACCULIST_CURRENT_SEGMENT" -le 0 ] && ZACCULIST_CURRENT_SEGMENT=1
         else
-            (( ZACCULIST_CURRENT_SEGMENT = ZACCULIST_CURRENT_SEGMENT - 1 ))
+            if [[ "$key" = BTAB && "$ZACCULIST_CURRENT_SEGMENT" -eq "1" ]]; then
+                [ "$current_idx" -gt "1" ] && current_idx=current_idx-1 && ZACCULIST_CURRENT_SEGMENT="100"
+            else
+                (( ZACCULIST_CURRENT_SEGMENT = ZACCULIST_CURRENT_SEGMENT - 1 ))
+            fi
         fi
         ;;
     (RIGHT|'l'|$'\t')
         (( ZACCULIST_CURRENT_SEGMENT = ZACCULIST_CURRENT_SEGMENT + 1 ))
+        if [ "$key" = $'\t' ]; then
+            [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ] && [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1 && ZACCULIST_CURRENT_SEGMENT="1"
+        fi
         [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ] && ZACCULIST_CURRENT_SEGMENT="$nseg"
         ;;
     (F1|F2|F3|F4)
@@ -213,11 +220,18 @@ case "$key" in
             (( ZACCULIST_CURRENT_SEGMENT = nseg - 1 ))
             [ "$ZACCULIST_CURRENT_SEGMENT" -le 0 ] && ZACCULIST_CURRENT_SEGMENT=1
         else
-            (( ZACCULIST_CURRENT_SEGMENT = ZACCULIST_CURRENT_SEGMENT - 1 ))
+            if [[ "$key" = BTAB && "$ZACCULIST_CURRENT_SEGMENT" -eq "1" ]]; then
+                [ "$current_idx" -gt "1" ] && current_idx=current_idx-1 && ZACCULIST_CURRENT_SEGMENT="100"
+            else
+                (( ZACCULIST_CURRENT_SEGMENT = ZACCULIST_CURRENT_SEGMENT - 1 ))
+            fi
         fi
         ;;
     (RIGHT|$'\t')
         (( ZACCULIST_CURRENT_SEGMENT = ZACCULIST_CURRENT_SEGMENT + 1 ))
+        if [ "$key" = $'\t' ]; then
+            [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ] && [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1 && ZACCULIST_CURRENT_SEGMENT="1"
+        fi
         [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ] && ZACCULIST_CURRENT_SEGMENT="$nseg"
         ;;
     (F1|F2|F3|F4)
