@@ -62,6 +62,7 @@ __accu_generator_vim1() {
     for a in "${args[@]}"; do
         # Skip options
         [[ "$a" = -[[:alnum:]]# ]] && continue
+        [[ "$a" = --[[:alnum:]]# ]] && continue
 
         if [ "$__accu_vim1_path_occured[$a]" != "1" ]; then
             __accu_vim1_was_content=1
