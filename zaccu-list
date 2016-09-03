@@ -171,8 +171,8 @@ _zacculist_mark_current_segment_in_current_element() {
         local output=""
 
         [[ "$ZACCULIST_CURRENT_SEGMENT" -lt 1 ]] && ZACCULIST_CURRENT_SEGMENT=1
+        [[ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ]] && ZACCULIST_CURRENT_SEGMENT="$nseg"
         integer active_segment="$ZACCULIST_CURRENT_SEGMENT"
-        [[ "$active_segment" -gt "$nseg" ]] && active_segment="$nseg"
 
         # Prepare output variables for zaccu-process-buffer
         local ZACCU_PB_WORDS="" ZACCU_PB_WORDS_BEGINNINGS="" ZACCU_PB_SPACES=""
