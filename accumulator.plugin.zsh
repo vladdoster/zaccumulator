@@ -138,8 +138,15 @@ function zaccu_get_button() {
 # $reply[2] - basename
 #
 function zaccu_resolve_path() {
+    local dirpath="$1" filepath="$2"
+
     reply=()
-    local p="$1/$2"
+
+    dirpath="${dirpath/#\~/$HOME}"
+    filepath="${filepath/#\~/$HOME}"
+
+    local p="$dirpath/$filepath"
+
     reply[1]="${p:h}"
     reply[2]="${p:t}"
 }
