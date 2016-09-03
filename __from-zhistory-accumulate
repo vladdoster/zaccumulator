@@ -78,7 +78,7 @@ __mytrackinghook() {
         # Store the command?
         if [ "$store" = "1" ]; then
             # We will save command with only one non-option argument
-            save_args+=( "$a" )
+            save_args+=( "$a:t" )
 
             # Simulate that working directory
             # is where the file is located
