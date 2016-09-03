@@ -31,7 +31,9 @@ function zaccu_stdlib_resolve_path() {
     local dirpath="$1" filepath="$2"
 
     local dirpath2="${dirpath/#\~/$HOME}"
+    dirpath2="${dirpath2:a}"
     local filepath2="${filepath/#\~/$HOME}"
+    filepath2="${filepath2:a}"
 
     reply=()
     if [ "${filepath2[1]}" = "/" ]; then
