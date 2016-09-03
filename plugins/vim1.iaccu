@@ -91,11 +91,15 @@ __accu_generator_vim1() {
 
             if [[ "${a[1]}" = "/" || "${a[1]}" = "~" ]]; then
                 zaccu_get_button "vim1C" 0 "$cmd" "$dir" "$file" "FileCD" __accu_action_cd_vim1
+                reply[4]=" ${reply[4]}"
             elif [[ "$a" = */* ]]; then
                 zaccu_get_button "vim1C" 0 "$cmd" "$dir" "$file" "FileCD" __accu_action_cd_vim1
+                reply[4]=" ${reply[4]}"
+            else
+                reply[4]=""
             fi
 
-            ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$reply[1] ${reply[2]} ${reply[3]} ${reply[4]}"$'\n'
+            ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$reply[1] ${reply[2]} ${reply[3]}${reply[4]}"$'\n'
         fi
     done
 }
