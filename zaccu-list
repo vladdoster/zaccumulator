@@ -484,7 +484,7 @@ while (( 1 )); do
     [ -n "$wname_status" ] && {
         local apath=""
         if zaccu_stdlib_decode_hyperlink "${tmp[$ZACCULIST_CURRENT_SEGMENT]}"; then
-            apath=" Working directory: ${reply[3]}"
+            apath=" Working directory: ${reply[4]}"
         fi
 
         local status_msg_strlen
