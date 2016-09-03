@@ -31,9 +31,10 @@ function zaccu_stdlib_resolve_path() {
     local dirpath="$1" filepath="$2"
 
     local dirpath2="${dirpath/#\~/$HOME}"
-    dirpath2="${dirpath2:a}"
+    # :a behaves weird, prepends paths, which are not CWD
+    [ "${dirpath2[1]}" = "/" ] && dirpath2="${dirpath2:a}"
     local filepath2="${filepath/#\~/$HOME}"
-    filepath2="${filepath2:a}"
+    [ "${filepath2[1]}" = "/" ] && filepath2="${filepath2:a}"
 
     reply=()
     if [ "${filepath2[1]}" = "/" ]; then
@@ -41,6 +42,7 @@ function zaccu_stdlib_resolve_path() {
         reply[2]="${filepath2:t}"
     else
         local p="$dirpath2/$filepath2"
+        [ "${p[1]}" = "/" ] && p="${p:a}"
         reply[1]="${p:h}"
         reply[2]="${p:t}"
     fi
