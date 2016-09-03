@@ -132,7 +132,7 @@ case "$key" in
     ('>'|'}')
         hscroll+=7
         ;;
-    (LEFT|'h')
+    (LEFT|'h'|BTAB)
         if [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ]; then
             (( ZACCULIST_CURRENT_SEGMENT = nseg - 1 ))
             [ "$ZACCULIST_CURRENT_SEGMENT" -le 0 ] && ZACCULIST_CURRENT_SEGMENT=1
@@ -208,7 +208,7 @@ case "$key" in
         current_idx=last_element
         _zacculist_compute_first_to_show_idx
         ;;
-    (LEFT)
+    (LEFT|BTAB)
         if [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ]; then
             (( ZACCULIST_CURRENT_SEGMENT = nseg - 1 ))
             [ "$ZACCULIST_CURRENT_SEGMENT" -le 0 ] && ZACCULIST_CURRENT_SEGMENT=1
