@@ -107,17 +107,23 @@ __mytrackinghook() {
 }
 
 integer todo=1000 current_done=0
+echo "I'll search for commands referring to files via absolute paths"
+echo "Normally (via tracking of enterred commands) all paths are supported"
+echo
 echo "Will gather maximum $todo commands for the database of commands"
 echo "Should I clear current database? (y/n)"
 read -sq confirm
 
 if [ "$confirm" = "y" ]; then
-    echo -n "Clearing.. "
+    echo -n "${fg_bold[red]}Clearing.. "
     rm -f "${ZACCU_CONFIG_DIR}/data/input.db"
-    echo "done"
+    echo "done$reset_color"
 else
-    echo "Database not cleared"
+    echo "${fg_bold[green]}Database not cleared$reset_color"
 fi
+
+echo
+sleep 1
 
 local entry
 for entry in "${history[@]}"; do
@@ -158,6 +164,6 @@ for entry in "${history[@]}"; do
     fi
 done
 
-echo "${fg_bold[green]}Gathered $current_done commands$reset_color"
+echo "${fg_bold[green]}Gathered $current_done commands (history ended)$reset_color"
 
 # vim:ft=zsh
