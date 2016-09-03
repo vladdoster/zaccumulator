@@ -1,0 +1,163 @@
+#
+# This command tries it best to find any commands with
+# absolute paths in $history, and feeds obtained data
+# to ~/.config/accumulator/data/input.db. History doesn't
+# contain that much data as our tracker provides, so this
+# is more for a quick start with using accumulator, to see
+# its features.
+#
+
+emulate -LR zsh
+setopt extendedglob typesetsilent
+
+autoload colors
+colors
+
+# Each unique command will be remembered
+# to not process it twice
+local -A already_hits
+
+__mytrackinghook() {
+    # Not interested in argumentless commands
+    [ "$#" = "1" ] && return 1
+
+    # Limit of number of added entries
+    [[ "$current_done" -ge "$todo" ]] && return 0
+
+    # The command
+    local cmd="$1"
+
+    # Its arguments
+    local -a args
+    shift
+    args=( "$@" )
+
+    # Here to-save arguments will be remembered
+    local -a save_args
+
+    local a
+    integer store
+    for a in "${args[@]}"; do
+        # Skip options, store them for possible save
+        [[ "$a" = -[[:alnum:]]# || "$a" = --[[:alnum:]]# ]] && { save_args+=( "$a" ); continue; }
+
+        store=0
+
+        # Possible "cd ..", etc.
+        [[ "$a" = ".." || "$a" = "." || "$a" = "/" ]] && continue
+
+        # I have ~/diff file, and git diff ... yields a false hit
+        [[ "$cmd" = "git" && "$a" = "diff" ]] && continue
+        [[ "$cmd" = "git" && "$a" = "status" ]] && continue
+
+        # No plugins for those commands
+        [[ "$cmd" = *=* || "$cmd" = "local" || "$cmd" = "sudo" || "$cmd" = "function" || "$cmd" = "compadd" ]] && continue
+        [[ "$cmd" = "echo" || "$cmd" = "printf" || "$cmd" = "wc" || "$cmd" = "declare" || "$cmd" = "compdef" ]] && continue
+        [[ "$cmd" = "bindkey" || "$cmd" = "zle" || "$cmd" = "integer" || "$cmd" = "time" || "$cmd" = "type" ]] && continue
+        [[ "$cmd" = "autoload" || "$cmd" = "tig" ]] && continue
+
+        # Does this look like an absolute path?
+        if [[ "${a[1]}" = "/" ]]; then
+            if [[ -e "$a" ]]; then
+                # Command is suitable for storing in input.db
+                store=1
+            fi
+        # Does this look like absolute path with ~ ?
+        elif [[ "${a[1]}" = "~" ]]; then
+            a="${a/#\~/$HOME}"
+            if [[ -e "$a" ]]; then
+                # Command is suitable for storing in input.db
+                store=1
+            fi
+        # Does the path work when prepended with $HOME?
+        elif [[ -e "$HOME/$a" && "$a" != "1" && "$a" != "2" && "$a" != "3" ]]; then
+            a="$HOME/$a"
+            store=1
+        fi
+
+        # Store the command?
+        if [ "$store" = "1" ]; then
+            # We will save command with only one non-option argument
+            save_args+=( "$a" )
+
+            # Simulate that working directory
+            # is where the file is located
+            local wd="${a:h}"
+            local cmd_with_params="$cmd ${(j: :)save_args[@]}"
+
+            # Don't use any command twice
+            [ "${already_hits[$cmd_with_params]}" = "1" ] && break
+            already_hits[$cmd_with_params]="1"
+
+            echo "${fg_bold[yellow]}Hit:$reset_color $cmd_with_params"
+
+            wd="${(q)wd}"
+            cmd_with_params="${(q)cmd_with_params}"
+            print -r -- "$wd $cmd_with_params $cmd_with_params" >> "${CONFIG_DIR}/data/input.db"
+
+            current_done=current_done+1
+            [[ "$current_done" -ge "$todo" ]] && echo "${fg_bold[green]}Gathered $todo commands, exiting$reset_color" && return 0
+
+            # Command saved, leave
+            break
+        fi
+    done
+
+    return 1
+}
+
+integer todo=1000 current_done=0
+echo "Will gather maximum $todo commands for the database of commands"
+echo "Should I clear current database? (y/n)"
+read -sq confirm
+
+if [ "$confirm" = "y" ]; then
+    echo -n "Clearing.. "
+    rm -f "${CONFIG_DIR}/data/input.db"
+    echo "done"
+else
+    echo "Database not cleared"
+fi
+
+local entry
+for entry in "${history[@]}"; do
+    local -a command_set
+    command_set=( "${(@z)entry}" )
+
+    # Search for commands in single entry of history
+    integer selected_idx=0 last_idx=1 i size="${#command_set}"
+    local cmd=""
+    for (( i=1; i<=size; i++ )); do
+        [[ "$cmd" = "" && "${command_set[i]}" = ";" ]] && continue
+
+        # Look for start of command
+        if [ "$cmd" = "" ]; then
+            cmd="${command_set[i]}"
+            selected_idx=i
+        fi
+
+        # Look for end of command
+        if [ "${command_set[i]}" = ";" ]; then
+            last_idx=i-1
+
+            if __mytrackinghook "${(@)command_set[$selected_idx,$last_idx]}"; then
+                return 0
+            fi
+
+            cmd=""
+            selected_idx=0
+            last_idx=0
+        fi
+    done
+
+    # Last command, without ";" at the end of it
+    if [[ "$selected_idx" -ne "0" ]]; then
+        if __mytrackinghook "${(@)command_set[$selected_idx,-1]}"; then
+            return 0
+        fi
+    fi
+done
+
+echo "${fg_bold[green]}Gathered $current_done commands$reset_color"
+
+# vim:ft=zsh
