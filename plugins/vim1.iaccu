@@ -18,6 +18,19 @@
 accu_initial_generator_vim1() {
     ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]="${ACC_GREEN}Vim last opened documents:${ACC_GREEN_E}"$'\n'
     accu_vim1_was_content=0
+
+    #
+    # Read configuration
+    #
+
+    local size
+    zstyle -s ":accumulator:vim1" size size || size="20"
+
+    # We run from accumulator, extendedglob is set
+    # <-> is: positive number, including 0
+    [[ "$size" != <-> ]] && size="20"
+
+    ZACCU_CONFIG[vim1_size]="$size"
 }
 
 
@@ -34,6 +47,8 @@ accu_generator_vim1() {
     shift 2
     args=( "$@" )
 
+    integer max_entries="${ZACCU_CONFIG[vim1_size]}"
+
     local a
     for a in "${args[@]}"; do
         # Skip options
@@ -42,6 +57,10 @@ accu_generator_vim1() {
         if [ "$accu_vim1_path_occured[$a]" != "1" ]; then
             accu_vim1_was_content=1
             accu_vim1_path_occured[$a]="1"
+
+            # Configurable limit on number of entries in the section
+            [[ "$accu_vim1_count" -ge "$max_entries" ]] && break
+            accu_vim1_count=accu_vim1_count+1
 
             zaccu_stdlib_resolve_path "$active_path" "$a"
             local dir="${reply[1]}" file="${reply[2]}"
@@ -74,6 +93,7 @@ accu_generator_vim1() {
 
 accu_final_generator_vim1() {
     accu_vim1_path_occured=()
+    accu_vim1_count=0
 
     # No content -> remove header
     if (( accu_vim1_was_content == 0 )); then
@@ -115,6 +135,9 @@ typeset -gA accu_vim1_path_occured
 
 # Detects whether any content occured
 integer -g accu_vim1_was_content
+
+# Counts number of entries generated
+integer -g accu_vim1_count
 
 #
 # Mark that the implementation is loaded
