@@ -56,7 +56,7 @@ __accu_generator_emacs1() {
     shift 2
     args=( "$@" )
 
-    integer max_entries="${ZACCU_CONFIG[emacs1_size]}"
+    integer max_entries="${ZACCU_CONFIG[emacs1_size]}" finished=0
 
     local a
     for a in "${args[@]}"; do
@@ -69,7 +69,7 @@ __accu_generator_emacs1() {
             __accu_emacs1_path_occured[$a]="1"
 
             # Configurable limit on number of entries in the section
-            [[ "$__accu_emacs1_count" -ge "$max_entries" ]] && break
+            [[ "$__accu_emacs1_count" -ge "$max_entries" ]] && finished=1 && break
             __accu_emacs1_count=__accu_emacs1_count+1
 
             zaccu_stdlib_resolve_path "$active_path" "$a"
@@ -102,6 +102,9 @@ __accu_generator_emacs1() {
             ZACCU_OUTPUT_DOCUMENT_SECTIONS[emacs1]+=$'\t'"$reply[1] ${reply[2]} ${reply[3]}${reply[4]}"$'\n'
         fi
     done
+
+    # finished -> 0 (shell true)
+    return $(( 1-finished ))
 }
 
 

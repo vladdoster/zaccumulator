@@ -41,6 +41,7 @@ function -zaccu_run_initial_generators() {
 #
 function -zaccu_run_generator() {
     local active_path="$1" cmd="$2"
+    integer exit_codes=0
 
     if [[ -n "$cmd" && -n "${ZACCU_PLUGS_TEXT_GENERATORS[$cmd]}" ]]; then
         # Single command might be routed to multiple
@@ -51,8 +52,11 @@ function -zaccu_run_generator() {
         local p
         for p in "${plugins[@]}"; do
             "$p" "$@"
+            exit_codes=exit_codes+$?
         done
     fi
+
+    return $exit_codes
 }
 
 #
