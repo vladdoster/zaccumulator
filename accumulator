@@ -102,6 +102,7 @@ ZACCU_OUTPUT_DOCUMENT_SECTIONS=()
 -zaccu_run_initial_generators
 
 input_arr=( "${(f)$(<"${input_db_path}")}" )
+input_arr=( "${(Oa)input_arr[@]}" )
 
 # TODO: detect active path modification inside one command set
 for entry in "${input_arr[@]}"; do
