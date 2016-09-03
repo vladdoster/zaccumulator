@@ -130,10 +130,20 @@ done
 local ZACCULIST_WRAPPER_BIT=""
 zaccu-usetty-wrapper zaccu-list-wrapper "${(@f)text}"
 
-# If BUFFER isn't empty, we will replace active
-# word under cursor (or just insert when not at
-# word) with selected entity
-if [ -n "$BUFFER" ]; then
+if [ -z "$BUFFER" ]; then
+    # ID, data1, data2, data3
+    if [[ "$ZACCULIST_WRAPPER_BIT" = (#b)*$'\1'([^$'\1']#)$'\1'([^$'\1']#)$'\1'([^$'\1']#)$'\1'([^$'\2']#)$'\2'* ]]; then
+        local id="${match[1]}" ts="${match[2]}" active_path="${match[3]}" file="${match[4]}"
+        if [ -n "${ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]}" ]; then
+            # Call the handled with all hyper-link data
+            "${ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]}" "$id" "$ts" "$active_path" "$file"
+        fi
+    fi
+else
+    # If BUFFER isn't empty, we will replace active
+    # word under cursor (or just insert when not at
+    # word) with selected entity
+
     # Process current buffer
     local ZACCU_PB_WORDS="" ZACCU_PB_WORDS_BEGINNINGS="" ZACCU_PB_SPACES=""
     local ZACCU_PB_SELECTED_WORD="" ZACCU_PB_LEFT="" ZACCU_PB_RIGHT=""
