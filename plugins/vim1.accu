@@ -19,5 +19,6 @@
 
 zaccu_register_plugin "vim" __accu_initial_generator_vim1 __accu_generator_vim1 __accu_final_generator_vim1
 zaccu_register_plugin "gvim" __accu_initial_generator_vim1 __accu_generator_vim1 __accu_final_generator_vim1
+zaccu_register_plugin "xxd" __accu_initial_generator_vim1 __accu_generator_vim1 __accu_final_generator_vim1
 
 # vim: ft=zsh
