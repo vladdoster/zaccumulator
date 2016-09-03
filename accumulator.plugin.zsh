@@ -31,7 +31,7 @@ autoload zaccu-process-buffer zaccu-usetty-wrapper zaccu-list zaccu-list-input z
 
 mkdir -p "${CONFIG_DIR}/data"
 
-trackinghook() {
+__trackinghook() {
     local first second
     first="${(q)PWD}"
     second="${(q)1}"
@@ -41,7 +41,7 @@ trackinghook() {
 }
 
 autoload add-zsh-hook
-add-zsh-hook preexec trackinghook
+add-zsh-hook preexec __trackinghook
 
 #
 # Initialize infrastructure globals
