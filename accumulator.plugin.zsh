@@ -23,7 +23,7 @@ fi
 # Autoload
 #
 
-autoload zaccu-process-buffer zaccu-usetty-wrapper zaccu-list zaccu-list-input zaccu-list-draw zaccu-list-wrapper accu
+autoload zaccu-process-buffer zaccu-usetty-wrapper zaccu-list zaccu-list-input zaccu-list-draw zaccu-list-wrapper accumulator
 
 #
 # Set up trackinghook

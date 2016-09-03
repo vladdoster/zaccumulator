@@ -4,7 +4,7 @@
 # choice in ZACCU_OUTPUT_DOCUMENT_SECTIONS[$SECTIONNAME] (global
 # hash). Initial and final generators manage header text.
 
-# Plugin functions are run from "accu" function, which has
+# Plugin functions are run from "accumulator" function, which has
 # emulate -LR zsh, setopt extendedglob. Other code is executed
 # in unknown environment
 
