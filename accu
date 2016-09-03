@@ -76,7 +76,7 @@ function -zaccu_load_implementation() {
     [ "${(P)var_name}" = "1" ] && return 1
 
     # Load
-    source "$REPO_DIR/plugins/${1}.iaccu"
+    source "$ZACCU_REPO_DIR/plugins/${1}.iaccu"
     return 0
 }
 
@@ -91,7 +91,7 @@ local -a input_arr
 
 # Load all plugin implementations
 local impl
-for impl in "$REPO_DIR"/plugins/*.iaccu; do
+for impl in "$ZACCU_REPO_DIR"/plugins/*.iaccu; do
     -zaccu_load_implementation "${${impl%.iaccu}:t}"
 done
 

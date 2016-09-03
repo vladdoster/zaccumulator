@@ -6,7 +6,7 @@
 #
 
 0="${(%):-%N}" # this gives immunity to functionargzero being unset
-REPO_DIR="${0%/*}"
+ZACCU_REPO_DIR="${0%/*}"
 CONFIG_DIR="$HOME/.config/accumulator"
 
 #
@@ -15,8 +15,8 @@ CONFIG_DIR="$HOME/.config/accumulator"
 # 2. Not having fpath already updated (that would equal: using other plugin manager)
 #
 
-if [[ -z "$ZPLG_CUR_PLUGIN" && "${fpath[(r)$REPO_DIR]}" != $REPO_DIR ]]; then
-    fpath+=( "$REPO_DIR" )
+if [[ -z "$ZPLG_CUR_PLUGIN" && "${fpath[(r)$ZACCU_REPO_DIR]}" != $ZACCU_REPO_DIR ]]; then
+    fpath+=( "$ZACCU_REPO_DIR" )
 fi
 
 #
@@ -59,7 +59,7 @@ ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS=()
 # Load standard library
 #
 
-source "$REPO_DIR"/plugins/stdlib.laccu
+source "$ZACCU_REPO_DIR"/plugins/stdlib.laccu
 
 #
 # Load plugins
@@ -123,7 +123,7 @@ function zaccu_get_button() {
 
 () {
     local p
-    for p in "$REPO_DIR"/plugins/*.accu; do
+    for p in "$ZACCU_REPO_DIR"/plugins/*.accu; do
         # The sourced plugin should provide 2 functions
         # and call zaccu_register_plugin() for them
         source "$p"
