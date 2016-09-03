@@ -116,6 +116,8 @@ for entry in "${input_arr[@]}"; do
     integer selected_idx=1 last_idx=1 i size="${#command_set}"
     local cmd=""
     for (( i=1; i<=size; i++ )); do
+        [[ "$cmd" = "" && "${command_set[i]}" = ";" ]] && continue
+
         # Look for start of command
         if [ "$cmd" = "" ]; then
             cmd="${command_set[i]}"
