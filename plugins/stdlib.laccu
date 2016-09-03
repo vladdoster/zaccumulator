@@ -1,14 +1,15 @@
 # Available colors to embed in generated text
-C_RED=$'\7'
-C_RED_E=$'\25'
-C_GREEN=$'\3'
-C_GREEN_E=$'\25'
-C_YELLOW=$'\4'
-C_YELLOW_E=$'\25'
-C_MAGENTA=$'\5'
-C_MAGENTA_E=$'\25'
-C_CYAN=$'\6'
-C_CYAN_E=$'\25'
+# ACC - accumulator color
+ACC_RED=$'\7'
+ACC_RED_E=$'\25'
+ACC_GREEN=$'\3'
+ACC_GREEN_E=$'\25'
+ACC_YELLOW=$'\4'
+ACC_YELLOW_E=$'\25'
+ACC_MAGENTA=$'\5'
+ACC_MAGENTA_E=$'\25'
+ACC_CYAN=$'\6'
+ACC_CYAN_E=$'\25'
 
 # Resolves absolute path from current working directory and file path
 #

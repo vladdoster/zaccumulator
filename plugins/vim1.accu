@@ -15,7 +15,7 @@
 
 # No arguments
 accu_initial_generator_vim1() {
-    ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]="${C_GREEN}Vim last opened documents:${C_GREEN_E}"$'\n'
+    ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]="${ACC_GREEN}Vim last opened documents:${ACC_GREEN_E}"$'\n'
     accu_vim1_was_content=0
 }
 
@@ -47,7 +47,7 @@ accu_generator_vim1() {
 
             # Truncate to 30 characters, right-pad to 35 characters
             file='%30<...<'"$file"
-            file="$C_YELLOW${(%)file}$C_YELLOW_E"
+            file="$ACC_YELLOW${(%)file}$ACC_YELLOW_E"
             file="${(r:35:: :)file}"
 
             reply=()

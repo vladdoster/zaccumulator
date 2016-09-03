@@ -111,14 +111,14 @@ _zacculist_colorify_disp_list() {
 
 # Changes color marks (\3, \4, \5, \6, \7) into ANSI color codes (green, yellow, magenta, cyan, red)
 _zacculist_translate_color_marks_in_disp_list() {
-    local C_RESET=$'\e[0m' C_RED=$'\e[0;31m' C_GREEN=$'\e[0;32m'
-    local C_YELLOW=$'\e[1;33m' C_MAGENTA=$'\e[0;35m' C_CYAN=$'\e[0;36m'
+    local ACC_RESET=$'\e[0m' ACC_RED=$'\e[0;31m' ACC_GREEN=$'\e[0;32m'
+    local ACC_YELLOW=$'\e[1;33m' ACC_MAGENTA=$'\e[0;35m' ACC_CYAN=$'\e[0;36m'
 
-    disp_list=( "${disp_list[@]//(#b)$'\3'([^$'\25']#)$'\25'/$C_GREEN$match[1]$C_RESET}" )
-    disp_list=( "${disp_list[@]//(#b)$'\4'([^$'\25']#)$'\25'/$C_YELLOW$match[1]$C_RESET}" )
-    disp_list=( "${disp_list[@]//(#b)$'\5'([^$'\25']#)$'\25'/$C_MAGENTA$match[1]$C_RESET}" )
-    disp_list=( "${disp_list[@]//(#b)$'\6'([^$'\25']#)$'\25'/$C_CYAN$match[1]$C_RESET}" )
-    disp_list=( "${disp_list[@]//(#b)$'\7'([^$'\25']#)$'\25'/$C_RED$match[1]$C_RESET}" )
+    disp_list=( "${disp_list[@]//(#b)$'\3'([^$'\25']#)$'\25'/$ACC_GREEN$match[1]$ACC_RESET}" )
+    disp_list=( "${disp_list[@]//(#b)$'\4'([^$'\25']#)$'\25'/$ACC_YELLOW$match[1]$ACC_RESET}" )
+    disp_list=( "${disp_list[@]//(#b)$'\5'([^$'\25']#)$'\25'/$ACC_MAGENTA$match[1]$ACC_RESET}" )
+    disp_list=( "${disp_list[@]//(#b)$'\6'([^$'\25']#)$'\25'/$ACC_CYAN$match[1]$ACC_RESET}" )
+    disp_list=( "${disp_list[@]//(#b)$'\7'([^$'\25']#)$'\25'/$ACC_RED$match[1]$ACC_RESET}" )
 }
 
 # Changes color marks (\3, \4, \5, \6, \7) into ANSI color codes (green, yellow, magenta, cyan, red)
@@ -127,16 +127,16 @@ _zacculist_translate_color_marks_in_disp_list() {
 # $REPLY - modified buffer
 #
 _zacculist_translate_color_marks() {
-    local C_RESET=$'\e[0m' C_RED=$'\e[0;31m' C_GREEN=$'\e[0;32m'
-    local C_YELLOW=$'\e[1;33m' C_MAGENTA=$'\e[0;35m' C_CYAN=$'\e[0;36m'
+    local ACC_RESET=$'\e[0m' ACC_RED=$'\e[0;31m' ACC_GREEN=$'\e[0;32m'
+    local ACC_YELLOW=$'\e[1;33m' ACC_MAGENTA=$'\e[0;35m' ACC_CYAN=$'\e[0;36m'
 
     local buf="$1"
 
-    buf=( "${buf//(#b)$'\3'([^$'\25']#)$'\25'/$C_GREEN$match[1]$C_RESET}" )
-    buf=( "${buf//(#b)$'\4'([^$'\25']#)$'\25'/$C_YELLOW$match[1]$C_RESET}" )
-    buf=( "${buf//(#b)$'\5'([^$'\25']#)$'\25'/$C_MAGENTA$match[1]$C_RESET}" )
-    buf=( "${buf//(#b)$'\6'([^$'\25']#)$'\25'/$C_CYAN$match[1]$C_RESET}" )
-    buf=( "${buf//(#b)$'\7'([^$'\25']#)$'\25'/$C_RED$match[1]$C_RESET}" )
+    buf=( "${buf//(#b)$'\3'([^$'\25']#)$'\25'/$ACC_GREEN$match[1]$ACC_RESET}" )
+    buf=( "${buf//(#b)$'\4'([^$'\25']#)$'\25'/$ACC_YELLOW$match[1]$ACC_RESET}" )
+    buf=( "${buf//(#b)$'\5'([^$'\25']#)$'\25'/$ACC_MAGENTA$match[1]$ACC_RESET}" )
+    buf=( "${buf//(#b)$'\6'([^$'\25']#)$'\25'/$ACC_CYAN$match[1]$ACC_RESET}" )
+    buf=( "${buf//(#b)$'\7'([^$'\25']#)$'\25'/$ACC_RED$match[1]$ACC_RESET}" )
 
     REPLY="$buf"
 }
