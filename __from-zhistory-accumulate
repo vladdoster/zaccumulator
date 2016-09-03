@@ -93,7 +93,7 @@ __mytrackinghook() {
 
             wd="${(q)wd}"
             cmd_with_params="${(q)cmd_with_params}"
-            print -r -- "$wd $cmd_with_params $cmd_with_params" >> "${CONFIG_DIR}/data/input.db"
+            print -r -- "$wd $cmd_with_params $cmd_with_params" >> "${ZACCU_CONFIG_DIR}/data/input.db"
 
             current_done=current_done+1
             [[ "$current_done" -ge "$todo" ]] && echo "${fg_bold[green]}Gathered $todo commands, exiting$reset_color" && return 0
@@ -113,7 +113,7 @@ read -sq confirm
 
 if [ "$confirm" = "y" ]; then
     echo -n "Clearing.. "
-    rm -f "${CONFIG_DIR}/data/input.db"
+    rm -f "${ZACCU_CONFIG_DIR}/data/input.db"
     echo "done"
 else
     echo "Database not cleared"

@@ -7,7 +7,7 @@
 
 0="${(%):-%N}" # this gives immunity to functionargzero being unset
 ZACCU_REPO_DIR="${0%/*}"
-CONFIG_DIR="$HOME/.config/accumulator"
+ZACCU_CONFIG_DIR="$HOME/.config/accumulator"
 
 #
 # Update FPATH if:
@@ -29,7 +29,7 @@ autoload zaccu-process-buffer zaccu-usetty-wrapper zaccu-list zaccu-list-input z
 # Set up trackinghook
 #
 
-mkdir -p "${CONFIG_DIR}/data"
+mkdir -p "${ZACCU_CONFIG_DIR}/data"
 
 __trackinghook() {
     local first second
@@ -37,7 +37,7 @@ __trackinghook() {
     second="${(q)1}"
     third="${(q)2}"
 
-    print -r -- "$first $second $third" >> "${CONFIG_DIR}/data/input.db"
+    print -r -- "$first $second $third" >> "${ZACCU_CONFIG_DIR}/data/input.db"
 }
 
 autoload add-zsh-hook
