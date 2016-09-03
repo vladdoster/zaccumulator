@@ -166,12 +166,12 @@ if [ -z "$ZACCULIST_WRAPPER_BIT" ]; then
 fi
 
 if [ -z "$BUFFER" ]; then
-    # ID, data1, data2, data3
+    # ID, data1, data2, data3, data4
     if zaccu_stdlib_decode_hyperlink "$ZACCULIST_WRAPPER_BIT"; then
-        local id="${reply[1]}" ts="${reply[2]}" active_path="${reply[3]}" file="${reply[4]}"
+        local id="${reply[1]}" ts="${reply[2]}" cmd="${reply[3]}" active_path="${reply[4]}" file="${reply[5]}"
         if [ -n "${ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]}" ]; then
             # Call the handled with all hyper-link data
-            "${ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]}" "$id" "$ts" "$active_path" "$file"
+            "${ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]}" "$id" "$ts" "$cmd" "$active_path" "$file"
         fi
     fi
 else

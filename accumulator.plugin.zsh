@@ -95,21 +95,19 @@ function zaccu_register_plugin() {
 # "[" and "]".
 #
 # $1 - action ID
-#
 # $2 - data1, e.g. timestamp
+# $3 - data2, e.g. command
+# $4 - data3, e.g. active path
+# $5 - data4, e.g. file path, file name, URL, other data
+# $6 - text
+# $7 - handler function name
 #
-# $3 - data2, e.g. active path
-#
-# $4 - data3, e.g. file path, file name, URL, other data
-#
-# $5 - text
-#
-# $6 - handler function
+# $reply array is extended by hyperlink's text (one new element)
 #
 function zaccu_get_std_button() {
-    local id="$1" data1="$2" data2="$3" data3="$4" text="$5"
-    reply+=( $'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"$data3"$'\2'"${text}" )
-    ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]="$6"
+    local id="$1" data1="$2" data2="$3" data3="$4" data4="$5" text="$6" handler="$7"
+    reply+=( $'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"$data3"$'\1'"$data4"$'\2'"${text}" )
+    ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]="$handler"
 }
 
 # Appends button hyperlink into "reply" output array
@@ -117,9 +115,9 @@ function zaccu_get_std_button() {
 # Arguments are the same as in zaccu_get_std_button
 #
 function zaccu_get_button() {
-    local id="$1" data1="$2" data2="$3" data3="$4" text="$5"
-    reply+=( "["$'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"$data3"$'\2'"${text}]" )
-    ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]="$6"
+    local id="$1" data1="$2" data2="$3" data3="$4" data4="$5" text="$6" handler="$7"
+    reply+=( "["$'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"$data3"$'\1'"$data4"$'\2'"${text}]" )
+    ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]="$handler"
 }
 
 () {
@@ -135,5 +133,5 @@ function zaccu_get_button() {
 # Setup Zle / keyboard shortcut
 #
 
-zle -N accu
-bindkey '^B' accu
+zle -N accumulator
+bindkey '^B' accumulator

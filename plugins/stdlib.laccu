@@ -74,17 +74,19 @@ function zaccu_stdlib_get_date_and_time_string() {
 #
 # $reply[1] - ID (of action)
 # $reply[2] - time stamp
-# $reply[3] - active path
-# $reply[4] - file
+# $reply[3] - command
+# $reply[4] - active path
+# $reply[5] - file
 #
 function zaccu_stdlib_decode_hyperlink() {
-    if [[ "$1" = (#b)*$'\1'([^$'\1']#)$'\1'([^$'\1']#)$'\1'([^$'\1']#)$'\1'([^$'\2']#)$'\2'* ]]; then
-        local id="${match[1]}" ts="${match[2]}" active_path="${match[3]}" file="${match[4]}"
+    if [[ "$1" = (#b)*$'\1'([^$'\1']#)$'\1'([^$'\1']#)$'\1'([^$'\1']#)$'\1'([^$'\1']#)$'\1'([^$'\2']#)$'\2'* ]]; then
+        local id="${match[1]}" ts="${match[2]}" cmd="${match[3]}" active_path="${match[4]}" file="${match[5]}"
         reply=()
         reply[1]="$id"
         reply[2]="$ts"
-        reply[3]="$active_path"
-        reply[4]="$file"
+        reply[3]="$cmd"
+        reply[4]="$active_path"
+        reply[5]="$file"
         return 0;
     fi
 

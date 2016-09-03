@@ -47,10 +47,11 @@ accu_initial_generator_vim1() {
 #
 
 # $1 - present working directory
-# $2 - it's "vim", the command that's invoked
+# $2 - it's "vim" or "gvim", the command that's invoked
 # $3, $4, ... - arguments passed to vim
 accu_generator_vim1() {
     local active_path="$1"
+    local cmd="$2"
     local -a args
     shift 2
     args=( "$@" )
@@ -80,14 +81,14 @@ accu_generator_vim1() {
 
             reply=()
 
-            # ID, data1, data2, data3, text, handler
-            zaccu_get_std_button "vim1" 0 "$active_path" "$a" "$file" accu_std_action_vim1
+            # ID, data1, data2, data3, data4, text, handler
+            zaccu_get_std_button "vim1" 0 "$cmd" "$active_path" "$a" "$file" accu_std_action_vim1
 
-            # ID, data1, data2, data3, text, handler
-            zaccu_get_button "vim1A" 0 "$active_path" "$a" "CD" accu_action_cd_vim1
+            # ID, data1, data2, data3, data4, text, handler
+            zaccu_get_button "vim1A" 0 "$cmd" "$active_path" "$a" "CD" accu_action_cd_vim1
 
-            # ID, data1, data2, data3, text, handler
-            zaccu_get_button "vim1B" 0 "$active_path" "$a" "Backup" accu_action_backup_vim1
+            # ID, data1, data2, data3, data4, text, handler
+            zaccu_get_button "vim1B" 0 "$cmd" "$active_path" "$a" "Backup" accu_action_backup_vim1
 
             ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$reply[1] ${reply[2]} ${reply[3]}"$'\n'
         fi
@@ -115,17 +116,17 @@ accu_final_generator_vim1() {
 #
 
 accu_std_action_vim1() {
-    local id="$1" ts="$2" active_path="$3" file="$4"
-    zaccu_stdlib_to_cmd_line "cd $active_path; vim $file"
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
+    zaccu_stdlib_to_cmd_line "cd $active_path; $cmd $file"
 }
 
 accu_action_cd_vim1() {
-    local id="$1" ts="$2" active_path="$3" file="$4"
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
     zaccu_stdlib_to_cmd_line "cd $active_path"
 }
 
 accu_action_backup_vim1() {
-    local id="$1" ts="$2" active_path="$3" file="$4" dest="${ZACCU_CONFIG[vim1_backupdir]}"
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5" dest="${ZACCU_CONFIG[vim1_backupdir]}"
 
     zaccu_stdlib_resolve_path "$active_path" "$file"
     local dir="${reply[1]}" file="${reply[2]}"
