@@ -97,7 +97,8 @@ accu_action_cd_vim1() {
 
 accu_action_backup_vim1() {
     local id="$1" ts="$2" active_path="$3" file="$4"
-    zaccu_stdlib_to_cmd_line "mkdir -p ~/.vbackup; cp $active_path/$file ~/.vbackup"
+    zaccu_stdlib_get_date_and_time_string
+    zaccu_stdlib_to_cmd_line "mkdir -p ~/.vbackup; cp $active_path/$file ~/.vbackup/${file}_$REPLY"
 }
 
 

@@ -52,4 +52,9 @@ function zaccu_stdlib_to_cmd_line() {
     fi
 }
 
+# Returns date and time
+function zaccu_stdlib_get_date_and_time_string() {
+    REPLY=$( date +%Y_%m_%d_%H.%M.%S )
+}
+
 # vim:ft=zsh
