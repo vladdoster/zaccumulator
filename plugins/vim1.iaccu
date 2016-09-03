@@ -114,7 +114,7 @@ accu_action_backup_vim1() {
 typeset -gA accu_vim1_path_occured
 
 # Detects whether any content occured
-integer accu_vim1_was_content
+integer -g accu_vim1_was_content
 
 #
 # Mark that the implementation is loaded
