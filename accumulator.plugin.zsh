@@ -140,15 +140,18 @@ function zaccu_get_button() {
 function zaccu_resolve_path() {
     local dirpath="$1" filepath="$2"
 
+    local dirpath2="${dirpath/#\~/$HOME}"
+    local filepath2="${filepath/#\~/$HOME}"
+
     reply=()
-
-    dirpath="${dirpath/#\~/$HOME}"
-    filepath="${filepath/#\~/$HOME}"
-
-    local p="$dirpath/$filepath"
-
-    reply[1]="${p:h}"
-    reply[2]="${p:t}"
+    if [ "${filepath2[1]}" = "/" ]; then
+        reply[1]="${filepath2:h}"
+        reply[2]="${filepath2:t}"
+    else
+        local p="$dirpath2/$filepath2"
+        reply[1]="${p:h}"
+        reply[2]="${p:t}"
+    fi
 }
 
 () {
