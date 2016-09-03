@@ -121,6 +121,7 @@ integer nonselectable_idx=1
 ZACCULIST_NONSELECTABLE_ELEMENTS=()
 for k in vim1; do
     ZACCULIST_NONSELECTABLE_ELEMENTS+=( "$nonselectable_idx" )
+    ZACCU_OUTPUT_DOCUMENT_SECTIONS[$k]="${ZACCU_OUTPUT_DOCUMENT_SECTIONS[$k]%$'\n'}"
     text+="${ZACCU_OUTPUT_DOCUMENT_SECTIONS[$k]}"
     splitted=( "${(f)ZACCU_OUTPUT_DOCUMENT_SECTIONS[$k]}" )
     nonselectable_idx+="${#splitted}"
