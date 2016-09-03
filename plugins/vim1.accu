@@ -5,7 +5,8 @@
 # hash). Initial and final generators manage header text.
 
 # Plugin functions are run from "accu" function, which has
-# emulate -LR zsh
+# emulate -LR zsh, setopt extendedglob. Other code is executed
+# in unknown environment
 
 
 #

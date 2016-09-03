@@ -3,7 +3,7 @@
 #
 
 emulate -LR zsh
-setopt typesetsilent
+setopt extendedglob typesetsilent
 
 autoload zaccu-process-buffer zaccu-usetty-wrapper zaccu-list zaccu-list-input zaccu-list-draw
 
