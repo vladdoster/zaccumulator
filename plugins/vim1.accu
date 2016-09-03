@@ -86,15 +86,18 @@ accu_final_generator_vim1() {
 #
 
 accu_std_action_vim1() {
-    echo "Std action"
+    local id="$1" ts="$2" active_path="$3" file="$4"
+    print -zr "cd $active_path; vim $file"
 }
 
 accu_action_cd_vim1() {
-    echo "Cd action"
+    local id="$1" ts="$2" active_path="$3" file="$4"
+    print -zr "cd $active_path"
 }
 
 accu_action_backup_vim1() {
-    echo "Backup action"
+    local id="$1" ts="$2" active_path="$3" file="$4"
+    print -zr "mkdir -p ~/.vbackup; cp $active_path/$file ~/.vbackup"
 }
 
 
