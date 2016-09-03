@@ -87,17 +87,38 @@ accu_final_generator_vim1() {
 
 accu_std_action_vim1() {
     local id="$1" ts="$2" active_path="$3" file="$4"
-    print -zr "cd $active_path; vim $file"
+    if zle; then
+        zle kill-buffer
+        BUFFER="cd $active_path; vim $file"
+        zle redisplay
+        zle beginning-of-line
+    else
+        print -zr "cd $active_path; vim $file"
+    fi
 }
 
 accu_action_cd_vim1() {
     local id="$1" ts="$2" active_path="$3" file="$4"
-    print -zr "cd $active_path"
+    if zle; then
+        zle kill-buffer
+        BUFFER="cd $active_path"
+        zle redisplay
+        zle beginning-of-line
+    else
+        print -zr "cd $active_path"
+    fi
 }
 
 accu_action_backup_vim1() {
     local id="$1" ts="$2" active_path="$3" file="$4"
-    print -zr "mkdir -p ~/.vbackup; cp $active_path/$file ~/.vbackup"
+    if zle; then
+        zle kill-buffer
+        BUFFER="mkdir -p ~/.vbackup; cp $active_path/$file ~/.vbackup"
+        zle redisplay
+        zle beginning-of-line
+    else
+        print -zr "mkdir -p ~/.vbackup; cp $active_path/$file ~/.vbackup"
+    fi
 }
 
 
