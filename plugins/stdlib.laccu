@@ -53,8 +53,35 @@ function zaccu_stdlib_to_cmd_line() {
 }
 
 # Returns date and time
+#
+# $REPLY - date and time string "Y_m_d_H.M.S"
+#
 function zaccu_stdlib_get_date_and_time_string() {
     REPLY=$( date +%Y_%m_%d_%H.%M.%S )
+}
+
+# Decodes given hyperlink and returns data contained. Testable
+# - test to check if hyperlink was correctly decoded
+#
+# $1 - hyperlink string
+#
+# $reply[1] - ID (of action)
+# $reply[2] - time stamp
+# $reply[3] - active path
+# $reply[4] - file
+#
+function zaccu_stdlib_decode_hyperlink() {
+    if [[ "$1" = (#b)*$'\1'([^$'\1']#)$'\1'([^$'\1']#)$'\1'([^$'\1']#)$'\1'([^$'\2']#)$'\2'* ]]; then
+        local id="${match[1]}" ts="${match[2]}" active_path="${match[3]}" file="${match[4]}"
+        reply=()
+        reply[1]="$id"
+        reply[2]="$ts"
+        reply[3]="$active_path"
+        reply[4]="$file"
+        return 0;
+    fi
+
+    return 1
 }
 
 # vim:ft=zsh
