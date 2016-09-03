@@ -15,9 +15,9 @@
 #
 
 # No arguments
-accu_initial_generator_vim1() {
+__accu_initial_generator_vim1() {
     ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]="${ACC_GREEN}Vim last opened documents:${ACC_GREEN_E}"$'\n'
-    accu_vim1_was_content=0
+    __accu_vim1_was_content=0
 
     #
     # Read configuration
@@ -49,7 +49,7 @@ accu_initial_generator_vim1() {
 # $1 - present working directory
 # $2 - it's "vim" or "gvim", the command that's invoked
 # $3, $4, ... - arguments passed to vim
-accu_generator_vim1() {
+__accu_generator_vim1() {
     local active_path="$1"
     local cmd="$2"
     local -a args
@@ -63,13 +63,13 @@ accu_generator_vim1() {
         # Skip options
         [[ "$a" = -[[:alnum:]]# ]] && continue
 
-        if [ "$accu_vim1_path_occured[$a]" != "1" ]; then
-            accu_vim1_was_content=1
-            accu_vim1_path_occured[$a]="1"
+        if [ "$__accu_vim1_path_occured[$a]" != "1" ]; then
+            __accu_vim1_was_content=1
+            __accu_vim1_path_occured[$a]="1"
 
             # Configurable limit on number of entries in the section
-            [[ "$accu_vim1_count" -ge "$max_entries" ]] && break
-            accu_vim1_count=accu_vim1_count+1
+            [[ "$__accu_vim1_count" -ge "$max_entries" ]] && break
+            __accu_vim1_count=__accu_vim1_count+1
 
             zaccu_stdlib_resolve_path "$active_path" "$a"
             local dir="${reply[1]}" file="${reply[2]}"
@@ -82,13 +82,13 @@ accu_generator_vim1() {
             reply=()
 
             # ID, data1, data2, data3, data4, text, handler
-            zaccu_get_std_button "vim1" 0 "$cmd" "$active_path" "$a" "$file" accu_std_action_vim1
+            zaccu_get_std_button "vim1" 0 "$cmd" "$active_path" "$a" "$file" __accu_std_action_vim1
 
             # ID, data1, data2, data3, data4, text, handler
-            zaccu_get_button "vim1A" 0 "$cmd" "$active_path" "$a" "CD" accu_action_cd_vim1
+            zaccu_get_button "vim1A" 0 "$cmd" "$active_path" "$a" "CD" __accu_action_cd_vim1
 
             # ID, data1, data2, data3, data4, text, handler
-            zaccu_get_button "vim1B" 0 "$cmd" "$active_path" "$a" "Backup" accu_action_backup_vim1
+            zaccu_get_button "vim1B" 0 "$cmd" "$active_path" "$a" "Backup" __accu_action_backup_vim1
 
             ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$reply[1] ${reply[2]} ${reply[3]}"$'\n'
         fi
@@ -100,12 +100,12 @@ accu_generator_vim1() {
 # Final generator
 #
 
-accu_final_generator_vim1() {
-    accu_vim1_path_occured=()
-    accu_vim1_count=0
+__accu_final_generator_vim1() {
+    __accu_vim1_path_occured=()
+    __accu_vim1_count=0
 
     # No content -> remove header
-    if (( accu_vim1_was_content == 0 )); then
+    if (( __accu_vim1_was_content == 0 )); then
         unset 'ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]'
     fi
 }
@@ -115,17 +115,17 @@ accu_final_generator_vim1() {
 # Actions
 #
 
-accu_std_action_vim1() {
+__accu_std_action_vim1() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
     zaccu_stdlib_to_cmd_line "cd $active_path; $cmd $file"
 }
 
-accu_action_cd_vim1() {
+__accu_action_cd_vim1() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
     zaccu_stdlib_to_cmd_line "cd $active_path"
 }
 
-accu_action_backup_vim1() {
+__accu_action_backup_vim1() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5" dest="${ZACCU_CONFIG[vim1_backupdir]}"
 
     zaccu_stdlib_resolve_path "$active_path" "$file"
@@ -140,18 +140,18 @@ accu_action_backup_vim1() {
 #
 
 # Detects if a path already occured
-typeset -gA accu_vim1_path_occured
+typeset -gA __accu_vim1_path_occured
 
 # Detects whether any content occured
-integer -g accu_vim1_was_content
+integer -g __accu_vim1_was_content
 
 # Counts number of entries generated
-integer -g accu_vim1_count
+integer -g __accu_vim1_count
 
 #
 # Mark that the implementation is loaded
 #
 
-typeset -g accu_vim1_loaded=1
+typeset -g __accu_vim1_loaded=1
 
 # vim: ft=zsh

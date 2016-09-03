@@ -71,7 +71,7 @@ function -zaccu_run_final_generators() {
 # $1 - plugin name
 #
 function -zaccu_load_implementation() {
-    local var_name="accu_${1}_loaded"
+    local var_name="__accu_${1}_loaded"
     # Already loaded?
     [ "${(P)var_name}" = "1" ] && return 1
 
