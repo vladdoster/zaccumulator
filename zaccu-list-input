@@ -144,12 +144,6 @@ case "$key" in
         (( ZACCULIST_CURRENT_SEGMENT = ZACCULIST_CURRENT_SEGMENT + 1 ))
         [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ] && ZACCULIST_CURRENT_SEGMENT="$nseg"
         ;;
-    (SLEFT|'H')
-        reply=( "$ZACCULIST_CURRENT_SEGMENT" MOVE_LEFT )
-        ;;
-    (SRIGHT|'L')
-        reply=( "$ZACCULIST_CURRENT_SEGMENT" MOVE_RIGHT )
-        ;;
     (F1|F2|F3|F4)
         reply=( -1 "$key" )
         ;;
