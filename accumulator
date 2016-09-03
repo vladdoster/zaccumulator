@@ -147,13 +147,13 @@ done
 
 local k text=""
 local -a splitted
-integer nonselectable_idx=1
+integer nonselectable_idx=2
 ZACCULIST_NONSELECTABLE_ELEMENTS=()
-for k in vim1; do
+for k in vim1 emacs1; do
     ZACCULIST_NONSELECTABLE_ELEMENTS+=( "$nonselectable_idx" )
     text+="${ZACCU_OUTPUT_DOCUMENT_SECTIONS[$k]}"
     splitted=( "${(f)ZACCU_OUTPUT_DOCUMENT_SECTIONS[$k]}" )
-    nonselectable_idx+="${#splitted}"
+    nonselectable_idx+=$(( ${#splitted} -1 ))
 done
 
 # Jumping over headers with [ and ]

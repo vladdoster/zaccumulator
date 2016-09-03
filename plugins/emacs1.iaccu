@@ -15,9 +15,9 @@
 #
 
 # No arguments
-__accu_initial_generator_vim1() {
-    ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]=$'\n'"${ACC_GREEN}Vim last opened documents:${ACC_GREEN_E}"$'\n'
-    __accu_vim1_was_content=0
+__accu_initial_generator_emacs1() {
+    ZACCU_OUTPUT_DOCUMENT_SECTIONS[emacs1]=$'\n'"${ACC_GREEN}Emacs last opened documents:${ACC_GREEN_E}"$'\n'
+    __accu_emacs1_was_content=0
 
     #
     # Read configuration
@@ -26,19 +26,19 @@ __accu_initial_generator_vim1() {
     # Size
 
     local size
-    zstyle -s ":accumulator:vim1" size size || size="20"
+    zstyle -s ":accumulator:emacs1" size size || size="20"
 
     # We run from accumulator, extendedglob is set
     # <-> is: positive number, including 0
     [[ "$size" != <-> ]] && size="20"
 
-    ZACCU_CONFIG[vim1_size]="$size"
+    ZACCU_CONFIG[emacs1_size]="$size"
 
     # Backup dir
 
     local backup_dir
-    zstyle -s ":accumulator:vim1" backup_dir backup_dir || backup_dir="~/.vbackup"
-    ZACCU_CONFIG[vim1_backupdir]="$backup_dir"
+    zstyle -s ":accumulator:emacs1" backup_dir backup_dir || backup_dir="~/.backup"
+    ZACCU_CONFIG[emacs1_backupdir]="$backup_dir"
 }
 
 
@@ -49,14 +49,14 @@ __accu_initial_generator_vim1() {
 # $1 - present working directory
 # $2 - it's "vim" or "gvim", the command that's invoked
 # $3, $4, ... - arguments passed to vim
-__accu_generator_vim1() {
+__accu_generator_emacs1() {
     local active_path="$1"
     local cmd="$2"
     local -a args
     shift 2
     args=( "$@" )
 
-    integer max_entries="${ZACCU_CONFIG[vim1_size]}"
+    integer max_entries="${ZACCU_CONFIG[emacs1_size]}"
 
     local a
     for a in "${args[@]}"; do
@@ -64,13 +64,13 @@ __accu_generator_vim1() {
         [[ "$a" = -[[:alnum:]]# ]] && continue
         [[ "$a" = --[[:alnum:]]# ]] && continue
 
-        if [ "$__accu_vim1_path_occured[$a]" != "1" ]; then
-            __accu_vim1_was_content=1
-            __accu_vim1_path_occured[$a]="1"
+        if [ "$__accu_emacs1_path_occured[$a]" != "1" ]; then
+            __accu_emacs1_was_content=1
+            __accu_emacs1_path_occured[$a]="1"
 
             # Configurable limit on number of entries in the section
-            [[ "$__accu_vim1_count" -ge "$max_entries" ]] && break
-            __accu_vim1_count=__accu_vim1_count+1
+            [[ "$__accu_emacs1_count" -ge "$max_entries" ]] && break
+            __accu_emacs1_count=__accu_emacs1_count+1
 
             zaccu_stdlib_resolve_path "$active_path" "$a"
             local dir="${reply[1]}" file="${reply[2]}"
@@ -83,23 +83,23 @@ __accu_generator_vim1() {
             reply=()
 
             # ID, data1, data2, data3, data4, text, handler
-            zaccu_get_std_button "vim1" 0 "$cmd" "$active_path" "$a" "$txtfile" __accu_std_action_vim1
+            zaccu_get_std_button "emacs1" 0 "$cmd" "$active_path" "$a" "$txtfile" __accu_std_action_emacs1
 
             # ID, data1, data2, data3, data4, text, handler
-            zaccu_get_button "vim1A" 0 "$cmd" "$active_path" "$a" "CD" __accu_action_cd_vim1
-            zaccu_get_button "vim1B" 0 "$cmd" "$active_path" "$a" "Backup" __accu_action_backup_vim1
+            zaccu_get_button "emacs1A" 0 "$cmd" "$active_path" "$a" "CD" __accu_action_cd_emacs1
+            zaccu_get_button "emacs1B" 0 "$cmd" "$active_path" "$a" "Backup" __accu_action_backup_emacs1
 
             if [[ "${a[1]}" = "/" || "${a[1]}" = "~" ]]; then
-                zaccu_get_button "vim1C" 0 "$cmd" "$dir" "$file" "FileCD" __accu_action_cd_vim1
+                zaccu_get_button "emacs1C" 0 "$cmd" "$dir" "$file" "FileCD" __accu_action_cd_emacs1
                 reply[4]=" ${reply[4]}"
             elif [[ "$a" = */* ]]; then
-                zaccu_get_button "vim1C" 0 "$cmd" "$dir" "$file" "FileCD" __accu_action_cd_vim1
+                zaccu_get_button "emacs1C" 0 "$cmd" "$dir" "$file" "FileCD" __accu_action_cd_emacs1
                 reply[4]=" ${reply[4]}"
             else
                 reply[4]=""
             fi
 
-            ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$reply[1] ${reply[2]} ${reply[3]}${reply[4]}"$'\n'
+            ZACCU_OUTPUT_DOCUMENT_SECTIONS[emacs1]+=$'\t'"$reply[1] ${reply[2]} ${reply[3]}${reply[4]}"$'\n'
         fi
     done
 }
@@ -109,13 +109,13 @@ __accu_generator_vim1() {
 # Final generator
 #
 
-__accu_final_generator_vim1() {
-    __accu_vim1_path_occured=()
-    __accu_vim1_count=0
+__accu_final_generator_emacs1() {
+    __accu_emacs1_path_occured=()
+    __accu_emacs1_count=0
 
     # No content -> remove header
-    if (( __accu_vim1_was_content == 0 )); then
-        unset 'ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]'
+    if (( __accu_emacs1_was_content == 0 )); then
+        unset 'ZACCU_OUTPUT_DOCUMENT_SECTIONS[emacs1]'
     fi
 }
 
@@ -124,18 +124,18 @@ __accu_final_generator_vim1() {
 # Actions
 #
 
-__accu_std_action_vim1() {
+__accu_std_action_emacs1() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
     zaccu_stdlib_to_cmd_line "cd $active_path; $cmd $file"
 }
 
-__accu_action_cd_vim1() {
+__accu_action_cd_emacs1() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
     zaccu_stdlib_to_cmd_line "cd $active_path"
 }
 
-__accu_action_backup_vim1() {
-    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5" dest="${ZACCU_CONFIG[vim1_backupdir]}"
+__accu_action_backup_emacs1() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5" dest="${ZACCU_CONFIG[emacs1_backupdir]}"
 
     zaccu_stdlib_resolve_path "$active_path" "$file"
     local dir="${reply[1]}" file="${reply[2]}"
@@ -149,18 +149,18 @@ __accu_action_backup_vim1() {
 #
 
 # Detects if a path already occured
-typeset -gA __accu_vim1_path_occured
+typeset -gA __accu_emacs1_path_occured
 
 # Detects whether any content occured
-integer -g __accu_vim1_was_content
+integer -g __accu_emacs1_was_content
 
 # Counts number of entries generated
-integer -g __accu_vim1_count
+integer -g __accu_emacs1_count
 
 #
 # Mark that the implementation is loaded
 #
 
-typeset -g __accu_vim1_loaded=1
+typeset -g __accu_emacs1_loaded=1
 
 # vim: ft=zsh

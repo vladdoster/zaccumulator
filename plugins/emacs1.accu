@@ -1,0 +1,19 @@
+# Accumulator plugin for EMACS. Commands like "emacs ~/.zshrc" are
+# routed to specified generator function.
+
+# Plugin functions are run from "accumulator" function, which has
+# emulate -LR zsh, setopt extendedglob. Other code is executed
+# in unknown environment
+
+# This file just registers plugin, doesn't provide implementation
+# - this is done to speed up shell startup time - loading of
+# implementation (*.iaccu file) will be done at first accumulator
+# run
+
+#
+# Register generators for command "emacs"
+#
+
+zaccu_register_plugin "emacs" __accu_initial_generator_emacs1 __accu_generator_emacs1 __accu_final_generator_emacs1
+
+# vim: ft=zsh
