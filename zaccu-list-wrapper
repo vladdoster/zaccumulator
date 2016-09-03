@@ -1,4 +1,5 @@
 emulate -LR zsh
+setopt extendedglob
 
 _zaccu_wrapper_has_terminfo=0
 
