@@ -23,6 +23,8 @@ accu_initial_generator_vim1() {
     # Read configuration
     #
 
+    # Size
+
     local size
     zstyle -s ":accumulator:vim1" size size || size="20"
 
@@ -31,6 +33,12 @@ accu_initial_generator_vim1() {
     [[ "$size" != <-> ]] && size="20"
 
     ZACCU_CONFIG[vim1_size]="$size"
+
+    # Backup dir
+
+    local backup_dir
+    zstyle -s ":accumulator:vim1" backup_dir backup_dir || backup_dir="~/.vbackup"
+    ZACCU_CONFIG[vim1_backupdir]="$backup_dir"
 }
 
 
@@ -117,13 +125,13 @@ accu_action_cd_vim1() {
 }
 
 accu_action_backup_vim1() {
-    local id="$1" ts="$2" active_path="$3" file="$4"
+    local id="$1" ts="$2" active_path="$3" file="$4" dest="${ZACCU_CONFIG[vim1_backupdir]}"
 
     zaccu_stdlib_resolve_path "$active_path" "$file"
     local dir="${reply[1]}" file="${reply[2]}"
 
     zaccu_stdlib_get_date_and_time_string
-    zaccu_stdlib_to_cmd_line "mkdir -p ~/.vbackup; cp $dir/$file ~/.vbackup/${file}_$REPLY"
+    zaccu_stdlib_to_cmd_line "mkdir -p $dest; cp $dir/$file $dest/${file}_$REPLY"
 }
 
 #
