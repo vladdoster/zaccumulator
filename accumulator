@@ -129,6 +129,20 @@ for entry in "${input_arr[@]}"; do
         if [ "$command_set[i]" = ";" ]; then
             last_idx=i-1
 
+            # Now - when a in-middle command is run - is the moment
+            # to detect "on the fly" working directory change
+            if [ "$cmd" = "cd" ]; then
+                if (( last_idx - selected_idx == 0 )); then
+                    active_path="$HOME"
+                elif (( last_idx - selected_idx == 1 )); then
+                    # TODO: CDPATH
+                    [[ "$active_path" != [+-]* ]] && active_path="${command_set[last_idx]}"
+                else
+                    # Unsupported yet
+                fi
+            fi
+
+            # Run generator
             -zaccu_run_generator "$active_path" "${(@)command_set[$selected_idx,$last_idx]}"
 
             cmd=""
