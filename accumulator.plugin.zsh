@@ -20,22 +20,10 @@ if [[ -z "$ZPLG_CUR_PLUGIN" && "${fpath[(r)$REPO_DIR]}" != $REPO_DIR ]]; then
 fi
 
 #
-# Autoload and colors
+# Autoload
 #
 
 autoload zaccu-process-buffer zaccu-usetty-wrapper zaccu-list zaccu-list-input zaccu-list-draw zaccu-list-wrapper accu
-
-# Available colors to embed in generated text
-C_RED=$'\7'
-C_RED_E=$'\25'
-C_GREEN=$'\3'
-C_GREEN_E=$'\25'
-C_YELLOW=$'\4'
-C_YELLOW_E=$'\25'
-C_MAGENTA=$'\5'
-C_MAGENTA_E=$'\25'
-C_CYAN=$'\6'
-C_CYAN_E=$'\25'
 
 #
 # Set up trackinghook
@@ -66,6 +54,12 @@ ZACCU_PLUGS_INITIAL_TEXT_GENERATORS=()
 ZACCU_PLUGS_TEXT_GENERATORS=()
 ZACCU_PLUGS_FINAL_TEXT_GENERATORS=()
 ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS=()
+
+#
+# Load standard library
+#
+
+source "$REPO_DIR"/plugins/stdlib.laccu
 
 #
 # Load plugins
@@ -125,33 +119,6 @@ function zaccu_get_button() {
     local id="$1" data1="$2" data2="$3" data3="$4" text="$5"
     reply+=( "["$'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"$data3"$'\2'"${text}]" )
     ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]="$6"
-}
-
-# Resolves absolute path from current working directory and file path
-#
-# $1 - current working directory
-#
-# $2 - file path
-#
-# $reply[1] - dirname
-#
-# $reply[2] - basename
-#
-function zaccu_resolve_path() {
-    local dirpath="$1" filepath="$2"
-
-    local dirpath2="${dirpath/#\~/$HOME}"
-    local filepath2="${filepath/#\~/$HOME}"
-
-    reply=()
-    if [ "${filepath2[1]}" = "/" ]; then
-        reply[1]="${filepath2:h}"
-        reply[2]="${filepath2:t}"
-    else
-        local p="$dirpath2/$filepath2"
-        reply[1]="${p:h}"
-        reply[2]="${p:t}"
-    fi
 }
 
 () {

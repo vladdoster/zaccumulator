@@ -1,0 +1,40 @@
+# Available colors to embed in generated text
+C_RED=$'\7'
+C_RED_E=$'\25'
+C_GREEN=$'\3'
+C_GREEN_E=$'\25'
+C_YELLOW=$'\4'
+C_YELLOW_E=$'\25'
+C_MAGENTA=$'\5'
+C_MAGENTA_E=$'\25'
+C_CYAN=$'\6'
+C_CYAN_E=$'\25'
+
+# Resolves absolute path from current working directory and file path
+#
+# $1 - current working directory
+#
+# $2 - file path
+#
+# $reply[1] - dirname
+#
+# $reply[2] - basename
+#
+function zaccu_stdlib_resolve_path() {
+    local dirpath="$1" filepath="$2"
+
+    local dirpath2="${dirpath/#\~/$HOME}"
+    local filepath2="${filepath/#\~/$HOME}"
+
+    reply=()
+    if [ "${filepath2[1]}" = "/" ]; then
+        reply[1]="${filepath2:h}"
+        reply[2]="${filepath2:t}"
+    else
+        local p="$dirpath2/$filepath2"
+        reply[1]="${p:h}"
+        reply[2]="${p:t}"
+    fi
+}
+
+# vim:ft=zsh
