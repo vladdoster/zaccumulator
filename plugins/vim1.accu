@@ -8,103 +8,10 @@
 # emulate -LR zsh, setopt extendedglob. Other code is executed
 # in unknown environment
 
-
-#
-# Initial generator
-#
-
-# No arguments
-accu_initial_generator_vim1() {
-    ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]="${ACC_GREEN}Vim last opened documents:${ACC_GREEN_E}"$'\n'
-    accu_vim1_was_content=0
-}
-
-
-#
-# Generator
-#
-
-# $1 - present working directory
-# $2 - it's "vim", the command that's invoked
-# $3, $4, ... - arguments passed to vim
-accu_generator_vim1() {
-    local active_path="$1"
-    local -a args
-    shift 2
-    args=( "$@" )
-
-    local a
-    for a in "${args[@]}"; do
-        # Skip options
-        [[ "$a" = -[[:alnum:]]# ]] && continue
-
-        if [ "$accu_vim1_path_occured[$a]" != "1" ]; then
-            accu_vim1_was_content=1
-            accu_vim1_path_occured[$a]="1"
-
-            zaccu_stdlib_resolve_path "$active_path" "$a"
-            local dir="${reply[1]}" file="${reply[2]}"
-
-            # Truncate to 30 characters, right-pad to 35 characters
-            file='%30<...<'"$file"
-            file="$ACC_YELLOW${(%)file}$ACC_YELLOW_E"
-            file="${(r:35:: :)file}"
-
-            reply=()
-
-            # ID, data1, data2, data3, text, handler
-            zaccu_get_std_button "vim1" 0 "$active_path" "$a" "$file" accu_std_action_vim1
-
-            # ID, data1, data2, data3, text, handler
-            zaccu_get_button "vim1A" 0 "$active_path" "$a" "CD" accu_action_cd_vim1
-
-            # ID, data1, data2, data3, text, handler
-            zaccu_get_button "vim1B" 0 "$active_path" "$a" "Backup" accu_action_backup_vim1
-
-            ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$reply[1] ${reply[2]} ${reply[3]}"$'\n'
-        fi
-    done
-}
-
-
-#
-# Final generator
-#
-
-accu_final_generator_vim1() {
-    accu_vim1_path_occured=()
-
-    # No content -> remove header
-    if (( accu_vim1_was_content == 0 )); then
-        unset 'ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]'
-    fi
-}
-
-
-#
-# Actions
-#
-
-accu_std_action_vim1() {
-    local id="$1" ts="$2" active_path="$3" file="$4"
-    zaccu_stdlib_to_cmd_line "cd $active_path; vim $file"
-}
-
-accu_action_cd_vim1() {
-    local id="$1" ts="$2" active_path="$3" file="$4"
-    zaccu_stdlib_to_cmd_line "cd $active_path"
-}
-
-accu_action_backup_vim1() {
-    local id="$1" ts="$2" active_path="$3" file="$4"
-
-    zaccu_stdlib_resolve_path "$active_path" "$file"
-    local dir="${reply[1]}" file="${reply[2]}"
-
-    zaccu_stdlib_get_date_and_time_string
-    zaccu_stdlib_to_cmd_line "mkdir -p ~/.vbackup; cp $dir/$file ~/.vbackup/${file}_$REPLY"
-}
-
+# This file just registers plugin, doesn't provide implementation
+# - this is done to speed up shell startup time - loading of
+# implementation (*.iaccu file) will be done at first accumulator
+# run
 
 #
 # Register generators for command "vim", "gvim"
@@ -112,16 +19,5 @@ accu_action_backup_vim1() {
 
 zaccu_register_plugin "vim" accu_initial_generator_vim1 accu_generator_vim1 accu_final_generator_vim1
 zaccu_register_plugin "gvim" accu_initial_generator_vim1 accu_generator_vim1 accu_final_generator_vim1
-
-
-#
-# Helper variables
-#
-
-# Detects if a path already occured
-typeset -gA accu_vim1_path_occured
-
-# Detects whether any content occured
-integer accu_vim1_was_content
 
 # vim: ft=zsh
