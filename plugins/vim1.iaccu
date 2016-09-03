@@ -77,8 +77,8 @@ __accu_generator_vim1() {
 
             # Truncate to 35 characters, right-pad to 40 characters
             txtfile='%35<...<'"$file"
-            txtfile="$ACC_YELLOW${(%)file}$ACC_YELLOW_E"
-            txtfile="${(r:40:: :)file}"
+            txtfile="$ACC_YELLOW${(%)txtfile}$ACC_YELLOW_E"
+            txtfile="${(r:40:: :)txtfile}"
 
             reply=()
 
