@@ -1,3 +1,9 @@
+#
+# Library file (*.laccu)
+#
+# Standard functions that can be used in plugins
+#
+
 # Available colors to embed in generated text
 # ACC - accumulator color
 ACC_RED=$'\7'
