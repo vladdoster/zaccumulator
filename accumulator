@@ -110,7 +110,8 @@ for entry in "${input_arr[@]}"; do
     active_path="${(Q)data_pack[1]}"
     copy_of_input="${(Q)data_pack[2]}"
 
-    local -a command_set=( "${(@z)copy_of_input}" )
+    local -a command_set
+    command_set=( "${(@z)copy_of_input}" )
     # Select last command in the input
     integer selected_idx=1 last_idx=1 i size="${#command_set}"
     local cmd=""
