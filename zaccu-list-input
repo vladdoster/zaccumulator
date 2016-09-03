@@ -88,9 +88,6 @@ case "$key" in
             _zacculist_cursor_visibility 1
         fi
         ;;
-    ($'\t')
-        reply=( $current_idx LEAVE )
-        ;;
     ($'\C-L')
         reply=( -1 REDRAW )
         ;;
@@ -143,7 +140,7 @@ case "$key" in
             (( ZACCULIST_CURRENT_SEGMENT = ZACCULIST_CURRENT_SEGMENT - 1 ))
         fi
         ;;
-    (RIGHT|'l')
+    (RIGHT|'l'|$'\t')
         (( ZACCULIST_CURRENT_SEGMENT = ZACCULIST_CURRENT_SEGMENT + 1 ))
         [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ] && ZACCULIST_CURRENT_SEGMENT="$nseg"
         ;;
@@ -225,7 +222,7 @@ case "$key" in
             (( ZACCULIST_CURRENT_SEGMENT = ZACCULIST_CURRENT_SEGMENT - 1 ))
         fi
         ;;
-    (RIGHT)
+    (RIGHT|$'\t')
         (( ZACCULIST_CURRENT_SEGMENT = ZACCULIST_CURRENT_SEGMENT + 1 ))
         [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ] && ZACCULIST_CURRENT_SEGMENT="$nseg"
         ;;
