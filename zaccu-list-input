@@ -149,11 +149,15 @@ case "$key" in
         fi
         ;;
     (RIGHT|'l'|$'\t')
-        (( ZACCULIST_CURRENT_SEGMENT = ZACCULIST_CURRENT_SEGMENT + 1 ))
-        if [ "$key" = $'\t' ]; then
-            [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ] && [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1 && ZACCULIST_CURRENT_SEGMENT="1"
+        if [[ "$key" = $'\t' && ${ZACCULIST_NONSELECTABLE_ELEMENTS[(r)$current_idx]} = $current_idx ]]; then
+            [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1 && ZACCULIST_CURRENT_SEGMENT=1
+        else
+            (( ZACCULIST_CURRENT_SEGMENT = ZACCULIST_CURRENT_SEGMENT + 1 ))
+            if [ "$key" = $'\t' ]; then
+                [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ] && [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1 && ZACCULIST_CURRENT_SEGMENT="1"
+            fi
+            [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ] && ZACCULIST_CURRENT_SEGMENT="$nseg"
         fi
-        [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ] && ZACCULIST_CURRENT_SEGMENT="$nseg"
         ;;
     (F1|F2|F3|F4)
         reply=( -1 "$key" )
@@ -236,11 +240,15 @@ case "$key" in
         fi
         ;;
     (RIGHT|$'\t')
-        (( ZACCULIST_CURRENT_SEGMENT = ZACCULIST_CURRENT_SEGMENT + 1 ))
-        if [ "$key" = $'\t' ]; then
-            [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ] && [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1 && ZACCULIST_CURRENT_SEGMENT="1"
+        if [[ "$key" = $'\t' && ${ZACCULIST_NONSELECTABLE_ELEMENTS[(r)$current_idx]} = $current_idx ]]; then
+            [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1 && ZACCULIST_CURRENT_SEGMENT=1
+        else
+            (( ZACCULIST_CURRENT_SEGMENT = ZACCULIST_CURRENT_SEGMENT + 1 ))
+            if [ "$key" = $'\t' ]; then
+                [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ] && [ "$current_idx" -lt "$last_element" ] && current_idx=current_idx+1 && ZACCULIST_CURRENT_SEGMENT="1"
+            fi
+            [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ] && ZACCULIST_CURRENT_SEGMENT="$nseg"
         fi
-        [ "$ZACCULIST_CURRENT_SEGMENT" -gt "$nseg" ] && ZACCULIST_CURRENT_SEGMENT="$nseg"
         ;;
     (F1|F2|F3|F4)
         reply=( -1 "$key" )
