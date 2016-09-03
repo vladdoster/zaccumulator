@@ -84,9 +84,13 @@ source "$ZACCU_REPO_DIR"/plugins/stdlib.laccu
 function zaccu_register_plugin() {
     local program="$1" initial="$2" generator="$3" final="$4"
 
-    ZACCU_PLUGS_INITIAL_TEXT_GENERATORS[$program]="$initial"
-    ZACCU_PLUGS_TEXT_GENERATORS[$program]="$generator"
-    ZACCU_PLUGS_FINAL_TEXT_GENERATORS[$program]="$final"
+    # Ability to register multiple generators per single command
+    ZACCU_PLUGS_INITIAL_TEXT_GENERATORS[$program]="${ZACCU_PLUGS_INITIAL_TEXT_GENERATORS[$program]} $initial"
+    ZACCU_PLUGS_INITIAL_TEXT_GENERATORS[$program]="${ZACCU_PLUGS_INITIAL_TEXT_GENERATORS[$program]# }"
+    ZACCU_PLUGS_TEXT_GENERATORS[$program]="${ZACCU_PLUGS_TEXT_GENERATORS[$program]} $generator"
+    ZACCU_PLUGS_TEXT_GENERATORS[$program]="${ZACCU_PLUGS_TEXT_GENERATORS[$program]# }"
+    ZACCU_PLUGS_FINAL_TEXT_GENERATORS[$program]="${ZACCU_PLUGS_FINAL_TEXT_GENERATORS[$program]} $final"
+    ZACCU_PLUGS_FINAL_TEXT_GENERATORS[$program]="${ZACCU_PLUGS_FINAL_TEXT_GENERATORS[$program]# }"
 }
 
 

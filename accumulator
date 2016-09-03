@@ -17,9 +17,15 @@ autoload zaccu-process-buffer zaccu-usetty-wrapper zaccu-list zaccu-list-input z
 # texts into ZACCU_OUTPUT_DOCUMENT_SECTIONS
 #
 function -zaccu_run_initial_generators() {
-    local g
-    for g in ${(v)ZACCU_PLUGS_INITIAL_TEXT_GENERATORS[@]}; do
-        "$g"
+    local g_g_
+    for g_g_ in "${(v@)ZACCU_PLUGS_INITIAL_TEXT_GENERATORS}"; do
+        local -a plugins
+        plugins=( "${(z@)g_g_}" )
+
+        local p
+        for p in "${plugins[@]}"; do
+            "$p"
+        done
     done
 }
 
@@ -35,9 +41,12 @@ function -zaccu_run_initial_generators() {
 #
 function -zaccu_run_generator() {
     local active_path="$1" cmd="$2"
+
     if [[ -n "$cmd" && -n "${ZACCU_PLUGS_TEXT_GENERATORS[$cmd]}" ]]; then
+        # Single command might be routed to multiple
+        # generators (e.g. two plugins for vim)
         local -a plugins
-        plugins=( "${(@z)ZACCU_PLUGS_TEXT_GENERATORS[$cmd]}" )
+        plugins=( "${(z@)ZACCU_PLUGS_TEXT_GENERATORS[$cmd]}" )
 
         local p
         for p in "${plugins[@]}"; do
@@ -54,9 +63,15 @@ function -zaccu_run_generator() {
 # from data constructed in generators
 #
 function -zaccu_run_final_generators() {
-    local g
-    for g in ${(v)ZACCU_PLUGS_FINAL_TEXT_GENERATORS[@]}; do
-        "$g"
+    local g_g_
+    for g_g_ in "${(v@)ZACCU_PLUGS_FINAL_TEXT_GENERATORS[@]}"; do
+        local -a plugins
+        plugins=( "${(z@)g_g_}" )
+
+        local p
+        for p in "${plugins[@]}"; do
+            "$p"
+        done
     done
 }
 
