@@ -37,13 +37,13 @@ _zacculist_status_msg() {
     if [ -n "$2" ]; then
         local cmd=" Cmd: " wd=" Working dir: "
         zcurses string "$wname_status" "$cmd"
-        zcurses attr "$wname_status" red/black
+        zcurses attr "$wname_status" "red/$background"
         zcurses string "$wname_status" "$2"
-        zcurses attr "$wname_status" white/black
+        zcurses attr "$wname_status" "$colorpair"
         zcurses string "$wname_status" "$wd"
-        zcurses attr "$wname_status" green/black
+        zcurses attr "$wname_status" "green/$background"
         zcurses string "$wname_status" "$3"
-        zcurses attr "$wname_status" white/black
+        zcurses attr "$wname_status" "$colorpair"
         (( status_msg_strlen += ${#cmd} + ${#2} + ${#wd} + ${#3} ))
     fi
 }
@@ -251,9 +251,20 @@ local MBEGIN MEND MATCH mbegin mend match
 integer nseg
 typeset -A "cursor_state"
 cursor_state=( "main" 1 "status" 1 )
-local boldattr
 
-[ "$bold" = "0" ] && boldattr="" || boldattr="+bold"
+# Load configuration
+local colorpair border bold
+zstyle -s ":accumulator" colorpair colorpair
+zstyle -s ":accumulator" border border
+zstyle -s ":accumulator" bold bold
+[ "$colorpair" = "" ] && colorpair="white/black"
+[ "$border" = "0" ] || border="1"
+local background="${colorpair#*/}"
+local backuptheme="$colorpair/$bold"
+zcurses bg "$wname_main" "$colorpair"
+zcurses bg "$wname_status" "$colorpair"
+
+[[ "$bold" = "1" || "$bold" = "+bold" ]] && bold="+bold" || bold="-bold"
 
 # Ability to remember the list between calls
 if [[ -z "$ZACCULIST_REMEMBER_STATE" || "$ZACCULIST_REMEMBER_STATE" -eq 0 || "$ZACCULIST_REMEMBER_STATE" -eq 2 ]]; then
@@ -485,11 +496,11 @@ while (( 1 )); do
             "$disp_list2[@]"
     fi
 
-    [ "$mark_header" = "1" ] && zcurses attr "$wname_main" "$boldattr" magenta/black
-    zcurses border "$wname_main"
+    [[ "$mark_header" = "1" && "$colorpair" = "white/black" ]] && zcurses attr "$wname_main" "$bold" "magenta/$background"
+    [ "$border" = "1" ] && zcurses border "$wname_main"
     zcurses move "$wname_main" 0 2
     zcurses string "$wname_main" "$header"
-    [ "$mark_header" = "1" ] && zcurses attr "$wname_main" "$boldattr" white/black
+    [[ "$mark_header" = "1" && "$colorpair" = "white/black" ]] && zcurses attr "$wname_main" "$bold" "$colorpair"
     _zacculist_cursor_visibility "main" "0"
     zcurses refresh "$wname_main"
 
@@ -516,7 +527,7 @@ while (( 1 )); do
             _zacculist_status_msg ""
         fi
 
-        zcurses border "$wname_status"
+        [ "$border" = "1" ] && zcurses border "$wname_status"
         # status_msg_strlen is set in _zacculist_status_msg()
         zcurses move "$wname_status" 1 $(( status_msg_strlen + 2 ))
         [ "$ZACCULIST_IS_SEARCH_MODE" -ne 1 ] && _zacculist_cursor_visibility "status" "0" || _zacculist_cursor_visibility "status" "1"

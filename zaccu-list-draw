@@ -74,9 +74,9 @@ _zacculist_print_with_ansi() {
 
         if (( no_match == 0 )); then
             if (( col >= 30 && col <= 37 )); then
-                zcurses attr "$win" $c[col-29]/black
+                zcurses attr "$win" "${c[col-29]}/$background"
             elif [[ "$col" -eq 0 ]]; then
-                zcurses attr "$win" white/black
+                zcurses attr "$win" "$colorpair"
             fi
         fi
     done
@@ -91,9 +91,7 @@ local text_offset="$6"
 local win="$7"
 shift 7
 integer max_text_len=page_width-x_offset
-local boldattr
 
-[ "$bold" = "0" ] && boldattr="" || boldattr="+bold"
 [[ "$active_text" = "underline" || "$active_text" = "reverse" ]] || local active_text="reverse"
 # Linux has ncv 18, screen* has ncv 3 - underline won't work properly
 (( ${terminfo[ncv]:-0} & 2 )) && active_text="reverse"
@@ -105,7 +103,7 @@ integer end_idx=max_idx
 [ "$end_idx" -gt "$#" ] && end_idx="$#"
 integer y=y_offset
 
-zcurses attr "$win" "$boldattr" white/black
+zcurses attr "$win" "$bold" "$colorpair"
 zcurses clear "$win"
 
 integer i text_len
@@ -137,5 +135,5 @@ if [ "$end_idx" -lt "$max_idx" ]; then
     zcurses clear "$win" eol
 fi
 
-zcurses attr "$win" white/black
+zcurses attr "$win" "$colorpair"
 # vim: set filetype=zsh:
