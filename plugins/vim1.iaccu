@@ -37,7 +37,7 @@ __accu_initial_generator_vim1() {
     # Backup dir
 
     local backup_dir
-    zstyle -s ":accumulator:vim1" backup_dir backup_dir || backup_dir="~/.vbackup"
+    zstyle -s ":accumulator:vim1" backup_dir backup_dir || backup_dir="~/.backup"
     ZACCU_CONFIG[vim1_backupdir]="$backup_dir"
 }
 
