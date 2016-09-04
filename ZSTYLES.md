@@ -1,6 +1,6 @@
 ## Accumulator's Zstyles
 
-Values being set are the defaults.
+The values being set are the defaults.
 
 ```zsh
 # Main
