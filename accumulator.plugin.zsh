@@ -37,7 +37,19 @@ __trackinghook() {
     second="${(q)1}"
     third="${(q)2}"
 
-    print -r -- "$first $second $third" >> "${ZACCU_CONFIG_DIR}/data/input.db"
+    # Get timestamp: via datetime module or via date command
+    local fork ts
+    zstyle -s ":accumulator:tracking" fork fork || fork="0"
+
+    if [ "$fork" = "0" ]; then
+        [[ "${+modules}" = 1 && "${modules[zsh/datetime]}" != "loaded" && "${modules[zsh/datetime]}" != "autoloaded" ]] && zmodload zsh/datetime
+        [ "${+modules}" = 0 ] && zmodload zsh/datetime
+        ts="$EPOCHSECONDS"
+    else
+        ts="$( date +%s )"
+    fi
+
+    print -r -- "$ts $first $second $third" >> "${ZACCU_CONFIG_DIR}/data/input.db"
 }
 
 autoload add-zsh-hook

@@ -70,6 +70,7 @@ __mytrackinghook() {
                 store=1
             fi
         # Does the path work when prepended with $HOME?
+        # Exclude some possible basic files
         elif [[ -e "$HOME/$a" && "$a" != "1" && "$a" != "2" && "$a" != "3" ]]; then
             a="$HOME/$a"
             store=1
@@ -93,7 +94,7 @@ __mytrackinghook() {
 
             wd="${(q)wd}"
             cmd_with_params="${(q)cmd_with_params}"
-            print -r -- "$wd $cmd_with_params $cmd_with_params" >> "${ZACCU_CONFIG_DIR}/data/input.db"
+            print -r -- "0 $wd $cmd_with_params $cmd_with_params" >> "${ZACCU_CONFIG_DIR}/data/input.db"
 
             current_done=current_done+1
             [[ "$current_done" -ge "$todo" ]] && echo "${fg_bold[green]}Gathered $todo commands, exiting$reset_color" && return 0
