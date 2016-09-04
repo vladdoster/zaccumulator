@@ -27,6 +27,12 @@ __mytrackinghook() {
     # The command
     local cmd="$1"
 
+    # No plugins for those commands
+    [[ "$cmd" = *=* || "$cmd" = "local" || "$cmd" = "sudo" || "$cmd" = "function" || "$cmd" = "compadd" ]] && continue
+    [[ "$cmd" = "echo" || "$cmd" = "printf" || "$cmd" = "wc" || "$cmd" = "declare" || "$cmd" = "compdef" ]] && continue
+    [[ "$cmd" = "bindkey" || "$cmd" = "zle" || "$cmd" = "integer" || "$cmd" = "time" || "$cmd" = "type" ]] && continue
+    [[ "$cmd" = "autoload" || "$cmd" = "tig" ]] && continue
+
     # Its arguments
     local -a args
     shift
@@ -49,12 +55,6 @@ __mytrackinghook() {
         # I have ~/diff file, and git diff ... yields a false hit
         [[ "$cmd" = "git" && "$a" = "diff" ]] && continue
         [[ "$cmd" = "git" && "$a" = "status" ]] && continue
-
-        # No plugins for those commands
-        [[ "$cmd" = *=* || "$cmd" = "local" || "$cmd" = "sudo" || "$cmd" = "function" || "$cmd" = "compadd" ]] && continue
-        [[ "$cmd" = "echo" || "$cmd" = "printf" || "$cmd" = "wc" || "$cmd" = "declare" || "$cmd" = "compdef" ]] && continue
-        [[ "$cmd" = "bindkey" || "$cmd" = "zle" || "$cmd" = "integer" || "$cmd" = "time" || "$cmd" = "type" ]] && continue
-        [[ "$cmd" = "autoload" || "$cmd" = "tig" ]] && continue
 
         # Does this look like an absolute path?
         if [[ "${a[1]}" = "/" ]]; then
