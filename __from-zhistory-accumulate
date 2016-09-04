@@ -79,12 +79,17 @@ __mytrackinghook() {
         # Store the command?
         if [ "$store" = "1" ]; then
             # We will save command with only one non-option argument
-            save_args+=( "$a:t" )
+            save_args+=( "${(q)${a:t}}" )
 
             # Simulate that working directory
             # is where the file is located
-            local wd="${a:h}"
-            local cmd_with_params="$cmd ${(j: :)save_args[@]}"
+            local wd="${(q)${a:h}}"
+            local cmd_with_params="${(q)cmd} ${(j: :)save_args[@]}"
+
+            # Here we have: non-option argument - quoted, working
+            # directory - quoted, cmd in cmd_with_params - quoted
+            # - as if user enterred it (except that (q) works more
+            # extensively than typical user quoting)
 
             # Don't use any command twice
             [ "${already_hits[$cmd_with_params]}" = "1" ] && break
@@ -93,7 +98,9 @@ __mytrackinghook() {
             echo "${fg_bold[yellow]}Hit:$reset_color $cmd_with_params"
 
             wd="${(q)wd}"
+            # Now is quoting for data storage - not for simulation of user input
             cmd_with_params="${(q)cmd_with_params}"
+            wd="${(q)wd}"
             print -r -- "0 $wd $cmd_with_params $cmd_with_params" >> "${ZACCU_CONFIG_DIR}/data/input.db"
 
             current_done=current_done+1
