@@ -508,8 +508,8 @@ while (( 1 )); do
     [ -n "$wname_status" ] && {
         local st_path="" st_cmd=""
         if zaccu_stdlib_decode_hyperlink "${tmp[$ZACCULIST_CURRENT_SEGMENT]}"; then
-            st_cmd="${reply[3]}"
-            st_path="${reply[4]}"
+            st_cmd="${(Q)reply[3]}"
+            st_path="${(Q)reply[4]}"
         fi
 
         local status_msg_strlen

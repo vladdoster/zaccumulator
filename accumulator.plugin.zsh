@@ -33,7 +33,10 @@ mkdir -p "${ZACCU_CONFIG_DIR}/data"
 
 __trackinghook() {
     local first second
-    first="${(q)PWD}"
+    # Simlate as-from-input quoting on PWD
+    # by additional (q) – as if user entered
+    # the path with backslashes
+    first="${(q)${(q)PWD}}"
     second="${(q)1}"
     third="${(q)2}"
 
@@ -121,7 +124,7 @@ function zaccu_register_plugin() {
 # $reply array is extended by hyperlink's text (one new element)
 #
 function zaccu_get_std_button() {
-    local id="$1" data1="$2" data2="$3" data3="$4" data4="$5" text="$6" handler="$7"
+    local id="${(q)1}" data1="${(q)2}" data2="${(q)3}" data3="${(q)4}" data4="${(q)5}" text="$6" handler="$7"
     reply+=( $'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"$data3"$'\1'"$data4"$'\2'"${text}" )
     ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]="$handler"
 }
@@ -131,7 +134,7 @@ function zaccu_get_std_button() {
 # Arguments are the same as in zaccu_get_std_button
 #
 function zaccu_get_button() {
-    local id="$1" data1="$2" data2="$3" data3="$4" data4="$5" text="$6" handler="$7"
+    local id="${(q)1}" data1="${(q)2}" data2="${(q)3}" data3="${(q)4}" data4="${(q)5}" text="$6" handler="$7"
     reply+=( "["$'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"$data3"$'\1'"$data4"$'\2'"${text}]" )
     ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]="$handler"
 }
