@@ -135,11 +135,11 @@ __mytrackinghook() {
 }
 
 integer todo=1000 current_done=0
-echo "I'll search for commands referring to files via absolute paths"
-echo "Normally (via tracking of enterred commands) all paths are supported"
+echo "${fg_bold[green]}Will search history for commands that provide enough information to guess$reset_color"
+echo "${fg_bold[green]}data that Accumulator gathers (history in general doesn't hold needed data)$reset_color"
 echo
-echo "Will gather maximum $todo commands for the database of commands"
-echo "Should I clear current database? (y/n)"
+echo "Will gather maximum $todo commands for Accumulator's database"
+echo "${fg_bold[yellow]}Should I clear current database? (y/n)$reset_color"
 read -sq confirm
 
 if [ "$confirm" = "y" ]; then
