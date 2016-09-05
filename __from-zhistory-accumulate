@@ -156,7 +156,8 @@ __mytrackinghook() {
 
 integer todo=1000 current_done=0
 echo "${fg_bold[green]}Will search history for commands that provide enough information to guess$reset_color"
-echo "${fg_bold[green]}data that Accumulator gathers (history in general doesn't hold needed data)$reset_color"
+echo "${fg_bold[green]}data that Accumulator gathers (history in general doesn't hold needed data).$reset_color"
+echo "${fg_bold[green]}This is only a convenient QUICK START, the guessed commands may not always work.$reset_color"
 echo
 echo "Will gather maximum $todo commands for Accumulator's database"
 echo "${fg_bold[yellow]}Should I clear current database? (y/n)$reset_color"
