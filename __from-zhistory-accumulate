@@ -54,8 +54,8 @@ __mytrackinghook() {
         [[ "$a" = ".." || "$a" = "." || "$a" = "/" ]] && break
 
         # I have ~/diff file, and git diff ... yields a false hit - NO PROCESSING
-        [[ "$cmd" = "git" && "$a" = "diff" ]] && save_args+=( "${(q)a}" ) && continue
-        [[ "$cmd" = "git" && "$a" = "status" ]] && save_args+=( "${(q)a}" ) && continue
+        [[ "$cmd" = "git" && "$a" = "diff" ]] && save_args+=( "$a" ) && continue
+        [[ "$cmd" = "git" && "$a" = "status" ]] && save_args+=( "$a" ) && continue
 
         # Looking for a first existing path, following aren't checked
         if [ "$any_existed" = "0" ]; then
@@ -81,17 +81,16 @@ __mytrackinghook() {
         fi
 
         if [ "$that_file_existed" = "0" ]; then
-            # Save file name argument with quoting, trying to
-            # mimick how user would quote it, e.g.: a\ file.txt
-            save_args+=( "${(q)a}" )
+            # Save argument without quoting, $history keeps user quoting
+            save_args+=( "$a" )
         else
             # $a is now absolute path, either reconstructed or given.
             # Check if it will be used for working directory. If yes,
             # then dir name can be skipped
             if [ "$any_existed" = "0" ]; then
-                save_args+=( "${(q)${a:t}}" )
+                save_args+=( "${a:t}" )
             else
-                save_args+=( "${(q)a}" )
+                save_args+=( "$a" )
             fi
         fi
 
@@ -114,13 +113,8 @@ __mytrackinghook() {
     fi
 
     if (( any_existed )); then
-        local wd="${(q)active_path}"
-        local cmd_with_params="${(q)cmd} ${(j: :)save_args[@]}"
-
-        # Here we have: non-option arguments - quoted, working
-        # directory - quoted, command in cmd_with_params - quoted
-        # - as if user enterred the line (except that (q) works
-        # more extensively than typical user quoting)
+        local wd="$active_path"
+        local cmd_with_params="$cmd ${(j: :)save_args[@]}"
 
         # Don't use any command twice
         [ "${already_hits[$cmd_with_params]}" = "1" ] && return 1
