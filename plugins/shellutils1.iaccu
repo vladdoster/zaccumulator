@@ -99,7 +99,7 @@ __accu_generator_shellutils1() {
         # that full command in status window.
         #
         # ID, data1, data2, data3, data4, text, handler
-        zaccu_get_button "shutils1A" "-1" "$cmd" "$active_path" "$concat" "$cmd" __accu_action_cmd_shellutils1
+        zaccu_get_button "shutils1A" "-1" "$cmd" "$active_path" "$concat" "${ACC_CYAN}${cmd}${ACC_CYAN_E}" __accu_action_cmd_shellutils1
         local quoted_button="${(q)reply[1]}" p
         for p in "${paths[@]}"; do
             # Dequote $active_path and $p that come from input with quoting
