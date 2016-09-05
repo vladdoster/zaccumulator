@@ -73,13 +73,14 @@ __accu_generator_emacs1() {
 
             # Dequote $active_path and $a that come from input with quoting
             # The quoting is needed for pasting at command line that's why
-            # we then again manually quote (the (q) flags) to simulate that
+            # we then again manually quote (the (q) flags)
             zaccu_stdlib_resolve_path "${(Q)active_path}" "${(Q)a}"
             local dir="${(q)reply[1]}" file="${(q)reply[2]}"
 
             # Truncate to 35 characters, right-pad to 40 characters
             # Quoting is kept so that (z) flags will correctly split
-            txtfile='%35<...<'"$file"
+            # (in the selection list, things there are done via z flag)
+            local txtfile='%35<...<'"$file"
             txtfile="$ACC_YELLOW${(%)txtfile}$ACC_YELLOW_E"
             txtfile="${(r:40:: :)txtfile}"
 
