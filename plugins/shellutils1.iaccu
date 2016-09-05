@@ -48,6 +48,11 @@ __accu_initial_generator_shellutils1() {
     local backup_dir
     zstyle -s ":accumulator:shellutils1" backup_dir backup_dir || backup_dir="~/.backup"
     ZACCU_CONFIG[shellutils1_backupdir]="$backup_dir"
+
+    ### Sort order
+    local sort_order
+    zstyle -s ":accumulator:shellutils1" sort_order sort_order || sort_order="recent_first"
+    ZACCU_CONFIG[shellutils1_sort_order]="$sort_order"
 }
 
 
@@ -136,6 +141,7 @@ __accu_generator_shellutils1() {
                 if [[ "$__accu_shellutils1_count" -lt "$max_entries" ]]; then
                     __accu_shellutils1_count+=1
                     __accu_shellutils1_paths_to_cmd_buttons[$resolved_path]="${__accu_shellutils1_paths_to_cmd_buttons[$resolved_path]} ${quoted_button}"
+                    __accu_shellutils1_paths_as_added_order+=( "$resolved_path" )
                 fi
             else
                 # Existing entry - if we are here then keep_going limit isn't reached
@@ -164,8 +170,17 @@ __accu_final_generator_shellutils1() {
         __accu_shellutils1_paths_to_cmd_buttons=()
         return
     else
+        # Establish sort order
+        local -a sorted_resolved_paths
+        if [ "${ZACCU_CONFIG[shellutils1_sort_order]}" = "file_locations" ]; then
+            sorted_resolved_paths=( "${(no)__accu_shellutils1_paths_as_added_order[@]}" )
+        else
+            sorted_resolved_paths=( "${__accu_shellutils1_paths_as_added_order[@]}" )
+        fi
+
+        # Output entries
         local p
-        for p in "${(kno)__accu_shellutils1_paths_to_cmd_buttons[@]}"; do
+        for p in "${sorted_resolved_paths[@]}"; do
             # Key is absolute path
             local dir="${p:h}" file="${p:t}"
 
@@ -276,6 +291,10 @@ integer -g __accu_shellutils1_kg_count
 # Buttons are quoted and appended after space: to extract use (z)
 # flag and then dequote. The buttons look like [cp], [mkdir], etc.
 typeset -gA __accu_shellutils1_paths_to_cmd_buttons
+
+# Array receiving entries (paths) as they are added, allows to
+# obtain most-recent sort order
+typeset -ga __accu_shellutils1_paths_as_added_order
 
 #
 # Mark that the implementation is loaded

@@ -23,4 +23,5 @@ zstyle ":accumulator:emacs1" backup_dir "~/.backup"         # Sets backup direct
 zstyle ":accumulator:shellutils1" size "15"                 # Limits number of entries (i.e. of files)
 zstyle ":accumulator:shellutils1" backup_dir "~/.backup"    # Sets backup directory (for backup action of Shell Utils plugin)
 zstyle ":accumulator:shellutils1" keep_going "100"          # Try `keep_going`-times to add command to any existing entry, after reaching max # of entries
+zstyle ":accumulator:shellutils1" sort_order "recent_first" # Files from newer commands are before others. Other order: "file_locations" – lexical sort on full file paths
 ```
