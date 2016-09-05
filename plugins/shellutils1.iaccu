@@ -57,6 +57,9 @@ __accu_generator_shellutils1() {
 
     integer max_entries="${ZACCU_CONFIG[shellutils1_size]}" finished=0
 
+    # Configurable limit on number of entries in the section
+    [[ "$__accu_shellutils1_count" -ge "$max_entries" ]] && finished=1 && return $(( 1-finished ))
+
     local -a paths opts
     local a
     for a in "${args[@]}"; do
@@ -75,10 +78,6 @@ __accu_generator_shellutils1() {
     if [ "$__accu_shellutils1_opts_paths_occured[$check]" != "1" ]; then
         __accu_shellutils1_was_content=1
         __accu_shellutils1_opts_paths_occured[$check]="1"
-
-        # Configurable limit on number of entries in the section
-        [[ "$__accu_shellutils1_count" -ge "$max_entries" ]] && finished=1 && break
-        __accu_shellutils1_count=__accu_shellutils1_count+1
 
         # Concatenate all paths and options in a (z)-splittable way
         local opts_concat="${(j: :)${(q)opts[@]}}"
@@ -109,6 +108,12 @@ __accu_generator_shellutils1() {
             zaccu_stdlib_resolve_path "${(Q)active_path}" "${(Q)p}"
             local resolved_path="${(q)reply[1]}/${(q)reply[2]}"
 
+            if (( ${+__accu_shellutils1_paths_to_cmd_buttons[$resolved_path]} == 0 )); then
+                # New entry
+                __accu_shellutils1_count=__accu_shellutils1_count+1
+            else
+                # Existing entry
+            fi
             __accu_shellutils1_paths_to_cmd_buttons[$resolved_path]="${__accu_shellutils1_paths_to_cmd_buttons[$resolved_path]} ${quoted_button}"
         done
     fi
