@@ -46,7 +46,7 @@ __mytrackinghook() {
     integer that_file_existed any_existed=0 acount=0 wd_selected=0
     for a in "${args[@]}"; do
         # Recognize options, store them immediately for possible command save
-        [[ "$a" = -[[:alnum:]]# || "$a" = --[[:alnum:]]# ]] && { save_args+=( "$a" ); continue; }
+        [[ "$a" = -[[:alnum:]]# || "$a" = --[[:alnum:]]# || "$a" = +[[:alnum:]]# ]] && { save_args+=( "$a" ); continue; }
 
         that_file_existed=0
 

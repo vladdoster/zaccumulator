@@ -60,8 +60,7 @@ __accu_generator_emacs1() {
     local a
     for a in "${args[@]}"; do
         # Skip options
-        [[ "$a" = -[[:alnum:]]# ]] && continue
-        [[ "$a" = --[[:alnum:]]# ]] && continue
+        [[ "$a" = -[[:alnum:]]# || "$a" = --[[:alnum:]]# || "$a" = +[[:alnum:]]# ]] && continue
 
         if [ "$__accu_emacs1_path_occured[$a]" != "1" ]; then
             __accu_emacs1_was_content=1
