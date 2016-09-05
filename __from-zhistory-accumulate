@@ -105,6 +105,14 @@ __mytrackinghook() {
         fi
     done
 
+    # Revert positive outcome if the result looks awkward
+    if (( any_existed )); then
+        local -a files
+        files=( "${(@)save_args:#-*}" ) # no -* elements
+        [ "${files[1]}" = "${files[2]}" ] && any_existed=0
+        [[ "${#files[1]}" = "1" || "${#files[2]}" = "1" ]] && any_existed=0
+    fi
+
     if (( any_existed )); then
         local wd="${(q)active_path}"
         local cmd_with_params="${(q)cmd} ${(j: :)save_args[@]}"
