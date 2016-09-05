@@ -128,6 +128,8 @@ __mytrackinghook() {
         [[ "$cmd" = "ln" && "$wd_selected" = "1" && "${#files}" = "1" ]] && any_existed=0
 
         [[ ( "$cmd" = "cp" || "$cmd" = "mv" ) && "${#files}" = "1" ]] && any_existed=0
+
+        [[ "$cmd" = "diff" && "${#files}" -gt 2 ]] && any_existed=0
     fi
 
     if (( any_existed )); then
