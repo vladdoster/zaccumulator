@@ -40,7 +40,10 @@ __trackinghook() {
     second="${(q)1}"
     third="${(q)2}"
 
+    ##
     # Get timestamp: via datetime module or via date command
+    ##
+
     local fork ts
     zstyle -s ":accumulator:tracking" fork fork || fork="0"
 
@@ -52,7 +55,60 @@ __trackinghook() {
         ts="$( date +%s )"
     fi
 
-    print -r -- "$ts $first $second $third" >> "${ZACCU_CONFIG_DIR}/data/input.db"
+    ##
+    # Check if we are in a project – by detecting .git dir,
+    # files: Makefile, CMakeLists.txt, configure, etc.
+    ##
+
+    local proj_discovery_nparents
+    zstyle -s ":accumulator:tracking" proj_discovery_nparents proj_discovery_nparents || proj_discovery_nparents=4
+
+    local look_in="$PWD" marks="" saved_marks
+    local -a tmp
+    integer PROJECT=0 SUBPROJECT=0
+    # -ge not -gt -> one run of the loop more than *_nparents,
+    # for PWD check, i.e. of current, not parent directory
+    while [[ "$proj_discovery_nparents" -ge 0 && "$look_in" != "/" ]]; do
+        (( proj_discovery_nparents = proj_discovery_nparents - 1 ))
+        [ -e "$look_in/.git" ] && marks+="GIT:1:"
+        [ -e "$look_in/Makefile" ] && marks+="MAKEFILE:1:"
+        [ -e "$look_in/CMakeLists.txt" ] && marks+="CMAKELISTS.TXT:1:"
+        [ -e "$look_in/configure" ] && marks+="CONFIGURE:1:"
+        [ -e "$look_in/SConstruct" ] && marks+="SCONSTRUCT:1:"
+
+        tmp=( "$look_in"/*.pro(NY1) )
+        [ "${#tmp}" != "0" ] && marks+="PRO:1:"
+        tmp=( "$look_in"/*.xcodeproj(NY1) )
+        [ "${#tmp}" != "0" ] && marks+="XCODEPROJ:1:"
+        tmp=( "$look_in"/*.cbp(NY1) )
+        [ "${#tmp}" != "0" ] && marks+="CBP:1:"
+
+        if [ -n "$marks" ]; then
+            if [ "$PROJECT" = "1" ]; then
+                marks=""
+                # Guard typical possible accident:
+                # Makefile or .git, etc. in $HOME
+                if [ "$look_in" != "$HOME" ]; then
+                    SUBPROJECT=1
+                    saved_marks+="SUBPROJECT:1:"
+                    # No save of outer project's marks
+                    break;
+                fi
+            else
+                # Guard typical possible accident:
+                # Makefile or .git, etc. in $HOME
+                if [ "$look_in" != "$HOME" ]; then
+                    PROJECT=1
+                    saved_marks="${marks}PROJECT:1:"
+                fi
+                marks=""
+            fi
+        fi
+        look_in="${look_in:h}"
+    done
+
+    # Empty saved_marks will become: ''
+    print -r -- "$ts $first $second $third ${(q)saved_marks}" >> "${ZACCU_CONFIG_DIR}/data/input.db"
 }
 
 autoload add-zsh-hook
