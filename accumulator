@@ -17,14 +17,18 @@ autoload zaccu-process-buffer zaccu-usetty-wrapper zaccu-list zaccu-list-input z
 # texts into ZACCU_OUTPUT_DOCUMENT_SECTIONS
 #
 function -zaccu_run_initial_generators() {
+    local -A already_ran
     local g_g_
-    for g_g_ in "${(v@)ZACCU_PLUGS_INITIAL_TEXT_GENERATORS}"; do
+    for g_g_ in "${(v@u)ZACCU_PLUGS_INITIAL_TEXT_GENERATORS}"; do
         local -a plugins
         plugins=( "${(z@)g_g_}" )
 
         local p
         for p in "${plugins[@]}"; do
-            "$p"
+            if [ "${already_ran[$p]}" != "1" ]; then
+                already_ran[$p]="1"
+                "$p"
+            fi
         done
     done
 }
@@ -68,14 +72,18 @@ function -zaccu_run_generator() {
 # from data constructed in generators
 #
 function -zaccu_run_final_generators() {
+    local -A already_ran
     local g_g_
-    for g_g_ in "${(v@)ZACCU_PLUGS_FINAL_TEXT_GENERATORS[@]}"; do
+    for g_g_ in "${(v@u)ZACCU_PLUGS_FINAL_TEXT_GENERATORS}"; do
         local -a plugins
         plugins=( "${(z@)g_g_}" )
 
         local p
         for p in "${plugins[@]}"; do
-            "$p"
+            if [ "${already_ran[$p]}" != "1" ]; then
+                already_ran[$p]="1"
+                "$p"
+            fi
         done
     done
 }
