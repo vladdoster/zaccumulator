@@ -16,7 +16,7 @@
 
 # No arguments
 __accu_initial_generator_emacs1() {
-    ZACCU_OUTPUT_DOCUMENT_SECTIONS[emacs1]=$'\n'"${ACC_GREEN}Emacs last opened documents:${ACC_GREEN_E}"$'\n'
+    ZACCU_OUTPUT_DOCUMENT_SECTIONS[emacs1]=$'\n'"${ACC_GREEN}EMACS LAST DOCUMENTS:${ACC_GREEN_E}"$'\n'
     __accu_emacs1_was_content=0
 
     #

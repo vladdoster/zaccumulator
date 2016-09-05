@@ -18,7 +18,7 @@
 
 # No arguments
 __accu_initial_generator_shellutils1() {
-    ZACCU_OUTPUT_DOCUMENT_SECTIONS[shellutils1]=$'\n'"${ACC_GREEN}Shell utils runs:${ACC_GREEN_E}"$'\n'
+    ZACCU_OUTPUT_DOCUMENT_SECTIONS[shellutils1]=$'\n'"${ACC_GREEN}GENERAL COMMAND LINE:${ACC_GREEN_E}"$'\n'
     __accu_shellutils1_was_content=0
 
     #

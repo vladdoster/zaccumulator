@@ -16,7 +16,7 @@
 
 # No arguments
 __accu_initial_generator_vim1() {
-    ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]=$'\n'"${ACC_GREEN}Vim last opened documents:${ACC_GREEN_E}"$'\n'
+    ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]=$'\n'"${ACC_GREEN}VIM LAST DOCUMENTS:${ACC_GREEN_E}"$'\n'
     __accu_vim1_was_content=0
 
     #
