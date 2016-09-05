@@ -113,6 +113,9 @@ __trackinghook() {
         look_in="${look_in:h}"
     done
 
+    # Queries will do :KEY: string search
+    [ -n "$saved_marks" ] && saved_marks=":$saved_marks"
+
     # Empty saved_marks will become: ''
     print -r -- "$ts $first $second $third ${(q)saved_marks}" >> "${ZACCU_CONFIG_DIR}/data/input.db"
 }
