@@ -65,6 +65,8 @@ _zaccu_wrapper_end() {
 
 _zaccu_wrapper_init_windows
 
+[ "$ZACCULIST_REMEMBER_STATE" != 1 ] && ZACCULIST_REMEMBER_STATE=2
+
 zaccu-list "main" $(( term_height-3 )) $term_width "status" "3" "$term_width" "  Accumulated data  " "1" "$@"
 
 if [[ "$REPLY" != "-1" && "$REPLY" = -(#c0,1)[0-9]## ]]; then
