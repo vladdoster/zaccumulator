@@ -126,6 +126,8 @@ __mytrackinghook() {
 
         # ln with single argument - the file should retain path (doable), and CWD is required (impossible)
         [[ "$cmd" = "ln" && "$wd_selected" = "1" && "${#files}" = "1" ]] && any_existed=0
+
+        [[ ( "$cmd" = "cp" || "$cmd" = "mv" ) && "${#files}" = "1" ]] && any_existed=0
     fi
 
     if (( any_existed )); then
