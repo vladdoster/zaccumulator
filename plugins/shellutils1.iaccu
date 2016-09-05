@@ -165,7 +165,7 @@ __accu_final_generator_shellutils1() {
         return
     else
         local p
-        for p in "${(k)__accu_shellutils1_paths_to_cmd_buttons[@]}"; do
+        for p in "${(kno)__accu_shellutils1_paths_to_cmd_buttons[@]}"; do
             # Key is absolute path
             local dir="${p:h}" file="${p:t}"
 
