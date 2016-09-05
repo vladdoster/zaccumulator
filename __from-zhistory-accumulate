@@ -123,6 +123,9 @@ __mytrackinghook() {
         # wasn't the first argument whose location was used to
         # establish working directory
         [[ ( "$cmd" = "cp" || "$cmd" = "mv" ) && "$wd_selected" != "1" ]] && any_existed=0
+
+        # ln with single argument - the file should retain path (doable), and CWD is required (impossible)
+        [[ "$cmd" = "ln" && "$wd_selected" = "1" && "${#files}" = "1" ]] && any_existed=0
     fi
 
     if (( any_existed )); then
