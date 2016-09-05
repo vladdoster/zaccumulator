@@ -43,7 +43,7 @@ __mytrackinghook() {
     save_args=()
 
     local a active_path=""
-    integer that_file_existed any_existed=0
+    integer that_file_existed any_existed=0 acount=0 wd_selected=0
     for a in "${args[@]}"; do
         # Recognize options, store them immediately for possible command save
         [[ "$a" = -[[:alnum:]]# || "$a" = --[[:alnum:]]# ]] && { save_args+=( "$a" ); continue; }
@@ -52,6 +52,10 @@ __mytrackinghook() {
 
         # Possible "cd ..", etc. - NO SAVING of suspicious commands
         [[ "$a" = ".." || "$a" = "." || "$a" = "/" ]] && break
+
+        # Count to know which argument will be
+        # used for working directory resolution
+        acount+=1
 
         # I have ~/diff file, and git diff ... yields a false hit - NO PROCESSING
         [[ "$cmd" = "git" && "$a" = "diff" ]] && save_args+=( "$a" ) && continue
@@ -101,15 +105,24 @@ __mytrackinghook() {
             # First existing file argument will be used for working directory
             # Simulated working directory is where the file is located
             active_path="${a:h}"
+
+            # Remember which argument was used for working directory resolution
+            wd_selected=acount
         fi
     done
 
-    # Revert positive outcome if the result looks awkward
+    # Revert positive outcome if the result looks
+    # awkward or doesn't have sense
     if (( any_existed )); then
         local -a files
         files=( "${(@)save_args:#-*}" ) # no -* elements
         [ "${files[1]}" = "${files[2]}" ] && any_existed=0
         [[ "${#files[1]}" = "1" || "${#files[2]}" = "1" ]] && any_existed=0
+
+        # There's little chance that cp or mv will work if it
+        # wasn't the first argument whose location was used to
+        # establish working directory
+        [[ ( "$cmd" = "cp" || "$cmd" = "mv" ) && "$wd_selected" != "1" ]] && any_existed=0
     fi
 
     if (( any_existed )); then
