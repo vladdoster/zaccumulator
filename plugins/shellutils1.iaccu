@@ -26,7 +26,7 @@ __accu_initial_generator_shellutils1() {
     # Size
 
     local size
-    zstyle -s ":accumulator:shellutils1" size size || size="20"
+    zstyle -s ":accumulator:shellutils1" size size || size="15"
 
     # We run from accumulator, extendedglob is set
     # <-> is: positive number, including 0
@@ -79,31 +79,37 @@ __accu_generator_shellutils1() {
         [[ "$__accu_shellutils1_count" -ge "$max_entries" ]] && finished=1 && break
         __accu_shellutils1_count=__accu_shellutils1_count+1
 
-        # Concatenate all paths and options in a splittable way
+        # Concatenate all paths and options in a (z)-splittable way
         local opts_concat="${(j: :)${(q)opts[@]}}"
         local paths_concat="${(j: :)${(q)paths[@]}}"
         local concat="${(q)opts_concat} ${(q)paths_concat}"
 
+        #
+        # Create command button (e.g. [cp]) and assign it to files
+        # Document is constructed in final generator
+        #
+
+        # First custom action: shutils1 + A (first letter of alphabet)
         reply=()
-
+        # A little hack: the typical time stamp field (data1) is used
+        # to pass special value: "-1". zaccu-list will do substring search
+        # for "-1" and when success, it will treat data4 field as full
+        # command data, "${(q)opts_concat} ${(q)paths_concat}" and display
+        # that full command in status window.
+        #
         # ID, data1, data2, data3, data4, text, handler
-        zaccu_get_std_button "shutils1" 0 "$cmd" "$active_path" "$concat" "$cmd" __accu_std_action_shellutils1
-
-        local p
-        integer count=1
+        zaccu_get_button "shutils1A" "-1" "$cmd" "$active_path" "$concat" "$cmd" __accu_action_cmd_shellutils1
+        local quoted_button="${(q)reply[1]}" p
         for p in "${paths[@]}"; do
-            zaccu_get_std_button "shutils1$count" 0 "$cmd" "$active_path" "${(q)p}" "${(q)p}" __accu_std_action_shellutils1
-            count+=1
+            # Dequote $active_path and $p that come from input with quoting
+            # The quoting is needed for pasting at command line that's why
+            # we then again manually quote (the (q) flags)
+            # By "with quoting" it's meant: user needs to quote things
+            zaccu_stdlib_resolve_path "${(Q)active_path}" "${(Q)p}"
+            local resolved_path="${(q)reply[1]}/${(q)reply[2]}"
+
+            __accu_shellutils1_paths_to_cmd_buttons[$resolved_path]="${__accu_shellutils1_paths_to_cmd_buttons[$resolved_path]} ${quoted_button}"
         done
-
-        local line1="${(j: :)reply[@]}"
-        reply=()
-
-        # ID, data1, data2, data3, data4, text, handler
-        zaccu_get_button "shutils1A" 0 "$cmd" "$active_path" "" "CD" __accu_action_cd_shellutils1
-        zaccu_get_button "shutils1B" 0 "$cmd" "$active_path" "$concat" "Backup" __accu_action_backup_shellutils1
-
-        ZACCU_OUTPUT_DOCUMENT_SECTIONS[shellutils1]+=$'\t'"$line1"$'\n\t'"${(j: :)reply[@]}"$'\n\n'
     fi
 
     # finished -> 0 (shell true)
@@ -119,9 +125,54 @@ __accu_final_generator_shellutils1() {
     __accu_shellutils1_opts_paths_occured=()
     __accu_shellutils1_count=0
 
-    # No content -> remove header
     if (( __accu_shellutils1_was_content == 0 )); then
+        # No content -> remove header
         unset 'ZACCU_OUTPUT_DOCUMENT_SECTIONS[shellutils1]'
+        __accu_shellutils1_paths_to_cmd_buttons=()
+        return
+    else
+        local p
+        for p in "${(k)__accu_shellutils1_paths_to_cmd_buttons[@]}"; do
+            # Key is absolute path
+            local dir="${p:h}" file="${p:t}"
+
+            reply=()
+
+            # Truncate to 35 characters, right-pad to 40 characters
+            # Quoting is kept so that (z) flags will correctly split
+            # (in the selection list, things there are done via z flag)
+            local txtfile='%35<...<'"$file"
+            txtfile="$ACC_YELLOW${(%)txtfile}$ACC_YELLOW_E"
+            txtfile="${(r:40:: :)txtfile}"
+
+            # Standard action - FileCD
+            # ID, data1, data2, data3, data4, text, handler
+            zaccu_get_std_button "shutils1" 0 "/FileCD/" "$dir" "$file" "$txtfile" __accu_std_action_shellutils1
+
+            # Backup - second custom action (first is running
+            # of command, constructed in generator)
+            zaccu_get_button "shutils1B" 0 "/Backup/" "$dir" "$file" "Backup" __accu_action_backup_shellutils1
+
+            ZACCU_OUTPUT_DOCUMENT_SECTIONS[shellutils1]+=$'\t'"${reply[1]}"$'\t'"${reply[2]}"
+
+            # Retrieve all (there can be many) buttons
+            # that run command, constructed in generator
+            local cmd_buttons_concat="${__accu_shellutils1_paths_to_cmd_buttons[$p]}"
+            local -a cmd_buttons
+            cmd_buttons=( "${(z@)cmd_buttons_concat}" )
+
+            # Append the buttons
+            local b
+            for b in "${cmd_buttons[@]}"; do
+                [ -z "$b" ] && continue
+                ZACCU_OUTPUT_DOCUMENT_SECTIONS[shellutils1]+=" ${(Q)b}"
+            done
+
+            ZACCU_OUTPUT_DOCUMENT_SECTIONS[shellutils1]+=$'\n'
+        done
+
+        # Free memory
+        __accu_shellutils1_paths_to_cmd_buttons=()
     fi
 }
 
@@ -131,6 +182,11 @@ __accu_final_generator_shellutils1() {
 #
 
 __accu_std_action_shellutils1() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
+    zaccu_stdlib_to_cmd_line "cd $active_path"
+}
+
+__accu_action_cmd_shellutils1() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" concat="$5"
 
     local -a qopts_qpaths
@@ -150,11 +206,6 @@ __accu_std_action_shellutils1() {
     else
         zaccu_stdlib_to_cmd_line "cd $active_path; $cmd ${opts[*]} ${paths[*]}"
     fi
-}
-
-__accu_action_cd_shellutils1() {
-    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
-    zaccu_stdlib_to_cmd_line "cd $active_path"
 }
 
 __accu_action_backup_shellutils1() {
@@ -180,6 +231,12 @@ integer -g __accu_shellutils1_was_content
 
 # Counts number of entries generated
 integer -g __accu_shellutils1_count
+
+# A map from file that occured in commands to buttons with full data
+# of that commands (quoted, concatenated, splittable with (z) flag)
+# Buttons are quoted and appended after space: to extract use (z)
+# flag and then dequote. The buttons look like [cp], [mkdir], etc.
+typeset -gA __accu_shellutils1_paths_to_cmd_buttons
 
 #
 # Mark that the implementation is loaded

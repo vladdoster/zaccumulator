@@ -510,6 +510,26 @@ while (( 1 )); do
         if zaccu_stdlib_decode_hyperlink "${tmp[$ZACCULIST_CURRENT_SEGMENT]}"; then
             st_cmd="${(Q)reply[3]}"
             st_path="${(Q)reply[4]}"
+
+            if [ "${reply[2]}" != "${reply[2]/-1/}" ]; then
+                local -a st_qopts_qpaths
+                st_qopts_qpaths=( "${(z@)reply[5]}" )
+
+                local st_opts_concat="${(Q)st_qopts_qpaths[1]}"
+                local st_paths_concat="${(Q)st_qopts_qpaths[2]}"
+
+                local -a st_opts st_paths
+                st_opts=( "${(z@)st_opts_concat}" )
+                st_opts=( "${(Q)st_opts[@]}" )
+                st_paths=( "${(z@)st_paths_concat}" )
+                st_paths=( "${(Q)st_paths[@]}" )
+
+                if [[ "${#st_opts}" = "0" || ( "${#st_opts}" = "1" && "${st_opts[1]}" = "" ) ]]; then
+                    st_cmd="${reply[3]} ${st_paths[*]}"
+                else
+                    st_cmd="${reply[3]} ${st_opts[*]} ${st_paths[*]}"
+                fi
+            fi
         fi
 
         local status_msg_strlen
