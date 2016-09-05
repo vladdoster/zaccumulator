@@ -23,7 +23,7 @@ __accu_initial_generator_shellutils1() {
     # Read configuration
     #
 
-    # Size
+    ### Size - max number of entries in generated section
 
     local size
     zstyle -s ":accumulator:shellutils1" size size || size="15"
@@ -34,7 +34,16 @@ __accu_initial_generator_shellutils1() {
 
     ZACCU_CONFIG[shellutils1_size]="$size"
 
-    # Backup dir
+    ### Keep going - try `keep_going`-times to add command to any existing entry, after reaching max # of entries
+
+    local keep_going
+    zstyle -s ":accumulator:shellutils1" keep_going keep_going || keep_going="100"
+
+    [[ "$keep_going" != <-> ]] && keep_going="100"
+
+    ZACCU_CONFIG[shellutils1_keep_going]="$keep_going"
+
+    ### Backup dir
 
     local backup_dir
     zstyle -s ":accumulator:shellutils1" backup_dir backup_dir || backup_dir="~/.backup"
@@ -55,10 +64,24 @@ __accu_generator_shellutils1() {
     shift 3
     args=( "$@" )
 
-    integer max_entries="${ZACCU_CONFIG[shellutils1_size]}" finished=0
+    integer max_entries="${ZACCU_CONFIG[shellutils1_size]}" keep_going="${ZACCU_CONFIG[shellutils1_keep_going]}" finished=0
 
     # Configurable limit on number of entries in the section
-    [[ "$__accu_shellutils1_count" -ge "$max_entries" ]] && finished=1 && return $(( 1-finished ))
+    if [[ "$__accu_shellutils1_count" -ge "$max_entries" ]]; then
+        # Are we in keep going state?
+        if [[ "$__accu_shellutils1_kg_count" -ge "$keep_going" ]]; then
+            # Keep going is also finished -> general finished state
+            finished=1
+            return $(( 1-finished ))
+        fi
+
+        # Here we count just tries, not actual additions
+        # of commands to existing entries. This protects
+        # against processing whole database striving for
+        # a new command for existing entry. Still allows
+        # to influence number of commands in entries.
+        __accu_shellutils1_kg_count+=1
+    fi
 
     local -a paths opts
     local a
@@ -109,12 +132,15 @@ __accu_generator_shellutils1() {
             local resolved_path="${(q)reply[1]}/${(q)reply[2]}"
 
             if (( ${+__accu_shellutils1_paths_to_cmd_buttons[$resolved_path]} == 0 )); then
-                # New entry
-                __accu_shellutils1_count=__accu_shellutils1_count+1
+                # New entry - only when entries limit isn't reached
+                if [[ "$__accu_shellutils1_count" -lt "$max_entries" ]]; then
+                    __accu_shellutils1_count+=1
+                    __accu_shellutils1_paths_to_cmd_buttons[$resolved_path]="${__accu_shellutils1_paths_to_cmd_buttons[$resolved_path]} ${quoted_button}"
+                fi
             else
-                # Existing entry
+                # Existing entry - if we are here then keep_going limit isn't reached
+                __accu_shellutils1_paths_to_cmd_buttons[$resolved_path]="${__accu_shellutils1_paths_to_cmd_buttons[$resolved_path]} ${quoted_button}"
             fi
-            __accu_shellutils1_paths_to_cmd_buttons[$resolved_path]="${__accu_shellutils1_paths_to_cmd_buttons[$resolved_path]} ${quoted_button}"
         done
     fi
 
@@ -130,6 +156,7 @@ __accu_generator_shellutils1() {
 __accu_final_generator_shellutils1() {
     __accu_shellutils1_opts_paths_occured=()
     __accu_shellutils1_count=0
+    __accu_shellutils1_kg_count=0
 
     if (( __accu_shellutils1_was_content == 0 )); then
         # No content -> remove header
@@ -240,6 +267,9 @@ integer -g __accu_shellutils1_was_content
 
 # Counts number of entries generated
 integer -g __accu_shellutils1_count
+
+# Counts number of tries of adding new command to existing entry
+integer -g __accu_shellutils1_kg_count
 
 # A map from file that occured in commands to buttons with full data
 # of that commands (quoted, concatenated, splittable with (z) flag)

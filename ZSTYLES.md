@@ -4,18 +4,23 @@ The values being set are the defaults.
 
 ```zsh
 # Main
-zstyle ":accumulator" bold "0"                          # Draw interface with no bold
-zstyle ":accumulator" colorpair "white/black"           # Text white, background black. Zsh 5.3 supports 254 numbers, e.g. 10/17
-zstyle ":accumulator" border "1"                        # Draw border around main and status windows
+zstyle ":accumulator" bold "0"                              # Draw interface with no bold
+zstyle ":accumulator" colorpair "white/black"               # Text white, background black. Zsh 5.3 supports 254 numbers, e.g. 10/17
+zstyle ":accumulator" border "1"                            # Draw border around main and status windows
 
 # Tracking
-zstyle ":accumulator:tracking" fork "0"                 # To obtain time stamp, use zsh/datetime module, if 1 then use date command
+zstyle ":accumulator:tracking" fork "0"                     # To obtain time stamp, use zsh/datetime module, if 1 then use date command
 
 # Vim plugin
-zstyle ":accumulator:vim1" size "20"                    # Limits number of Vim entries
-zstyle ":accumulator:vim1" backup_dir "~/.backup"       # Sets backup directory (for backup action of Vim plugin)
+zstyle ":accumulator:vim1" size "20"                        # Limits number of Vim entries
+zstyle ":accumulator:vim1" backup_dir "~/.backup"           # Sets backup directory (for backup action of Vim plugin)
 
 # Emacs plugin
-zstyle ":accumulator:emacs1" size "20"                  # Limits number of Emacs entries
-zstyle ":accumulator:emacs1" backup_dir "~/.backup"     # Sets backup directory (for backup action of Emacs plugin)
+zstyle ":accumulator:emacs1" size "20"                      # Limits number of Emacs entries
+zstyle ":accumulator:emacs1" backup_dir "~/.backup"         # Sets backup directory (for backup action of Emacs plugin)
+
+# Shell Utils plugin
+zstyle ":accumulator:shellutils1" size "15"                 # Limits number of entries (i.e. of files)
+zstyle ":accumulator:shellutils1" backup_dir "~/.backup"    # Sets backup directory (for backup action of Shell Utils plugin)
+zstyle ":accumulator:shellutils1" keep_going "100"          # Try `keep_going`-times to add command to any existing entry, after reaching max # of entries
 ```
