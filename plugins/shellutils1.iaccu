@@ -60,7 +60,8 @@ __accu_generator_shellutils1() {
     local -a paths opts
     local a
     for a in "${args[@]}"; do
-        if [[ "$a" = -[[:alnum:]]# || "$a" = --[[:alnum:]]# ]]; then
+        if [[ ( "$a" = -[[:alnum:]]# || "$a" = --[[:alnum:]]# || "$a" = +[[:alnum:]]# ) ||
+              ( "$cmd" = "chmod" && "$a" = [augo][+=-][[:alpha:]]# ) ]]; then
             opts+=( "$a" )
         else
             paths+=( "$a" )
