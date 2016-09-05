@@ -65,12 +65,14 @@ __trackinghook() {
 
     local look_in="$PWD" marks="" saved_marks
     local -a tmp
-    integer PROJECT=0 SUBPROJECT=0
+    integer PROJECT=0 SUBPROJECT=0 is_git
     # -ge not -gt -> one run of the loop more than *_nparents,
     # for PWD check, i.e. of current, not parent directory
     while [[ "$proj_discovery_nparents" -ge 0 && "$look_in" != "/" ]]; do
         (( proj_discovery_nparents = proj_discovery_nparents - 1 ))
-        [ -e "$look_in/.git" ] && marks+="GIT:1:"
+
+        is_git=0
+        [ -e "$look_in/.git" ] && marks+="GIT:1:" && is_git=1
         [ -e "$look_in/Makefile" ] && marks+="MAKEFILE:1:"
         [ -e "$look_in/CMakeLists.txt" ] && marks+="CMAKELISTS.TXT:1:"
         [ -e "$look_in/configure" ] && marks+="CONFIGURE:1:"
@@ -91,6 +93,10 @@ __trackinghook() {
                 if [ "$look_in" != "$HOME" ]; then
                     SUBPROJECT=1
                     saved_marks+="SUBPROJECT:1:"
+
+                    # Mark that there is an outer git repo
+                    (( is_git )) && saved_marks+="OGIT:1:"
+
                     # No save of outer project's marks
                     break;
                 fi
