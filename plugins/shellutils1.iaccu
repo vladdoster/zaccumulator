@@ -167,8 +167,6 @@ __accu_final_generator_shellutils1() {
     if (( __accu_shellutils1_was_content == 0 )); then
         # No content -> remove header
         unset 'ZACCU_OUTPUT_DOCUMENT_SECTIONS[shellutils1]'
-        __accu_shellutils1_paths_to_cmd_buttons=()
-        return
     else
         # Establish sort order
         local -a sorted_resolved_paths
@@ -221,10 +219,11 @@ __accu_final_generator_shellutils1() {
 
             ZACCU_OUTPUT_DOCUMENT_SECTIONS[shellutils1]+=$'\n'
         done
-
-        # Free memory
-        __accu_shellutils1_paths_to_cmd_buttons=()
     fi
+
+    # Free memory
+    __accu_shellutils1_paths_to_cmd_buttons=()
+    __accu_shellutils1_paths_as_added_order=()
 }
 
 
