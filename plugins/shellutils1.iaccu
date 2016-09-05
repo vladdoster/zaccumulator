@@ -1,8 +1,10 @@
-# Accumulator plugin for VIM. Commands like "vim ~/.zshrc" are
-# routed to specified generator function. The generator creates
-# text with hyperlinks and appends the text to $SECTIONNAME of
-# choice in ZACCU_OUTPUT_DOCUMENT_SECTIONS[$SECTIONNAME] (global
-# hash). Initial and final generators manage header text.
+# Accumulator plugin for various shell utils. Commands like "vim
+# ~/.zshrc" are routed to specified generator function. Typical
+# main generator creates text with hyperlinks and appends the
+# text to $SECTIONNAME of choice in ZACCU_OUTPUT_DOCUMENT_SECTI\
+# ONS[$SECTIONNAME] (global hash). Here, main generator creates
+# command buttons and it's the final generator that makes use of
+# this accumulated data and constructs document.
 
 # Plugin functions are run from "accumulator" function, which has
 # emulate -LR zsh, setopt extendedglob. Other code is executed
