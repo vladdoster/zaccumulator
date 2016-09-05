@@ -1,0 +1,306 @@
+# Accumulator plugin for development aid. Commands like "cmake
+# -DCMAKE_VERBOSE_MAKEFILE" are routed to specified generator
+# function. Typical main generator creates text with hyperlinks
+# and appends the text to $SECTIONNAME of choice in ZACCU_OUTPUT\
+# _DOCUMENT_SECTIONS[$SECTIONNAME] (global hash). Here, main ge-
+# rator creates command buttons and it's the final generator that
+# makes use of this accumulated data and constructs document
+
+# Plugin functions are run from "accumulator" function, which has
+# emulate -LR zsh, setopt extendedglob. Other code is executed
+# in unknown environment
+
+# This is implementation file - there's no registration here
+
+#
+# Initial generator
+#
+
+# No arguments
+__accu_initial_generator_development1() {
+    ZACCU_OUTPUT_DOCUMENT_SECTIONS[development1]=$'\n'"${ACC_GREEN}DEVELOPMENT:${ACC_GREEN_E}"$'\n'
+    __accu_development1_was_content=0
+
+    #
+    # Read configuration
+    #
+
+    ### Size - max number of entries in generated section
+
+    local size
+    zstyle -s ":accumulator:development1" size size || size="15"
+
+    # We run from accumulator, extendedglob is set
+    # <-> is: positive number, including 0
+    [[ "$size" != <-> ]] && size="20"
+
+    ZACCU_CONFIG[development1_size]="$size"
+
+    ### Keep going - try `keep_going`-times to add command to any existing entry, after reaching max # of entries
+
+    local keep_going
+    zstyle -s ":accumulator:development1" keep_going keep_going || keep_going="100"
+
+    [[ "$keep_going" != <-> ]] && keep_going="100"
+
+    ZACCU_CONFIG[development1_keep_going]="$keep_going"
+
+    ### Backup dir
+
+    local backup_dir
+    zstyle -s ":accumulator:development1" backup_dir backup_dir || backup_dir="~/.backup"
+    ZACCU_CONFIG[development1_backupdir]="$backup_dir"
+
+    ### Sort order
+    local sort_order
+    zstyle -s ":accumulator:development1" sort_order sort_order || sort_order="recent_first"
+    ZACCU_CONFIG[development1_sort_order]="$sort_order"
+}
+
+
+#
+# Generator
+#
+
+# $1 - present working directory
+# $2 - it's "vim" or "gvim", the command that's invoked
+# $3, $4, ... - arguments passed to vim
+__accu_generator_development1() {
+    local ts="$1" active_path="$2" cmd="$3"
+    local -a args
+    shift 3
+    args=( "$@" )
+
+    integer max_entries="${ZACCU_CONFIG[development1_size]}" keep_going="${ZACCU_CONFIG[development1_keep_going]}" finished=0
+
+    # Configurable limit on number of entries in the section
+    if [[ "$__accu_development1_count" -ge "$max_entries" ]]; then
+        # Are we in keep going state?
+        if [[ "$__accu_development1_kg_count" -ge "$keep_going" ]]; then
+            # Keep going is also finished -> general finished state
+            finished=1
+            return $(( 1-finished ))
+        fi
+
+        # Here we count just tries, not actual additions
+        # of commands to existing entries. This protects
+        # against processing whole database striving for
+        # a new command for existing entry. Still allows
+        # to influence number of commands in entries.
+        __accu_development1_kg_count+=1
+    fi
+
+    local -a paths opts
+    local a
+    for a in "${args[@]}"; do
+        if [[ ( "$a" = -[[:alnum:]]# || "$a" = --[[:alnum:]]# || "$a" = +[[:alnum:]]# ) ||
+              ( "$cmd" = "chmod" && "$a" = [augo][+=-][[:alpha:]]# ) ]]; then
+            opts+=( "$a" )
+        else
+            paths+=( "$a" )
+        fi
+    done
+
+    # There are extreme cases where this might
+    # be the same for two different paths
+    local check="${(j:,:)opts}.${(j:,:)paths}"
+
+    if [ "$__accu_development1_opts_paths_occured[$check]" != "1" ]; then
+        __accu_development1_was_content=1
+        __accu_development1_opts_paths_occured[$check]="1"
+
+        # Concatenate all paths and options in a (z)-splittable way
+        local opts_concat="${(j: :)${(q)opts[@]}}"
+        local paths_concat="${(j: :)${(q)paths[@]}}"
+        local concat="${(q)opts_concat} ${(q)paths_concat}"
+
+        #
+        # Create command button (e.g. [cp]) and assign it to files
+        # Document is constructed in final generator
+        #
+
+        # First custom action: shutils1 + A (first letter of alphabet)
+        reply=()
+        # A little hack: the typical time stamp field (data1) is used
+        # to pass special value: "-1". zaccu-list will do substring search
+        # for "-1" and when success, it will treat data4 field as full
+        # command data, "${(q)opts_concat} ${(q)paths_concat}" and display
+        # that full command in status window.
+        #
+        # ID, data1, data2, data3, data4, text, handler
+        zaccu_get_button "shutils1A" "-1" "$cmd" "$active_path" "$concat" "${ACC_CYAN}${cmd}${ACC_CYAN_E}" __accu_action_cmd_development1
+        local quoted_button="${(q)reply[1]}" p
+        for p in "${paths[@]}"; do
+            # Dequote $active_path and $p that come from input with quoting
+            # The quoting is needed for pasting at command line that's why
+            # we then again manually quote (the (q) flags)
+            # By "with quoting" it's meant: user needs to quote things
+            zaccu_stdlib_resolve_path "${(Q)active_path}" "${(Q)p}"
+            local resolved_path="${(q)reply[1]}/${(q)reply[2]}"
+
+            if (( ${+__accu_development1_paths_to_cmd_buttons[$resolved_path]} == 0 )); then
+                # New entry - only when entries limit isn't reached
+                if [[ "$__accu_development1_count" -lt "$max_entries" ]]; then
+                    __accu_development1_count+=1
+                    __accu_development1_paths_to_cmd_buttons[$resolved_path]="${__accu_development1_paths_to_cmd_buttons[$resolved_path]} ${quoted_button}"
+                    __accu_development1_paths_as_added_order+=( "$resolved_path" )
+                fi
+            else
+                # Existing entry - if we are here then keep_going limit isn't reached
+                __accu_development1_paths_to_cmd_buttons[$resolved_path]="${__accu_development1_paths_to_cmd_buttons[$resolved_path]} ${quoted_button}"
+            fi
+        done
+    fi
+
+    # finished -> 0 (shell true)
+    return $(( 1-finished ))
+}
+
+
+#
+# Final generator
+#
+
+__accu_final_generator_development1() {
+    __accu_development1_opts_paths_occured=()
+    __accu_development1_count=0
+    __accu_development1_kg_count=0
+
+    if (( __accu_development1_was_content == 0 )); then
+        # No content -> remove header
+        unset 'ZACCU_OUTPUT_DOCUMENT_SECTIONS[development1]'
+    else
+        # Establish sort order
+        local -a sorted_resolved_paths
+        if [ "${ZACCU_CONFIG[development1_sort_order]}" = "file_locations" ]; then
+            sorted_resolved_paths=( "${(no)__accu_development1_paths_as_added_order[@]}" )
+        else
+            sorted_resolved_paths=( "${__accu_development1_paths_as_added_order[@]}" )
+        fi
+
+        # Output entries
+        local p
+        for p in "${sorted_resolved_paths[@]}"; do
+            # Key is absolute path
+            local dir="${p:h}" file="${p:t}"
+
+            reply=()
+
+            # Truncate to 35 characters, right-pad to 40 characters
+            # Quoting is kept so that (z) flags will correctly split
+            # (in the selection list, things there are done via z flag)
+            #
+            # Also, quote % so that prompt expansion doesn't interfere
+            local txtfile="${file//\%/%%}"
+            txtfile='%35<...<'"$txtfile"
+            txtfile="$ACC_YELLOW${(%)txtfile}$ACC_YELLOW_E"
+            txtfile="${(r:40:: :)txtfile}"
+
+            # Standard action - FileCD
+            # ID, data1, data2, data3, data4, text, handler
+            zaccu_get_std_button "shutils1" 0 "/FileCD/" "$dir" "$file" "$txtfile" __accu_std_action_development1
+
+            # Backup - second custom action (first is running
+            # of command, constructed in generator)
+            zaccu_get_button "shutils1B" 0 "/Backup/" "$dir" "$file" "Backup" __accu_action_backup_development1
+
+            ZACCU_OUTPUT_DOCUMENT_SECTIONS[development1]+=$'\t'"${reply[1]}"$'\t'"${reply[2]}"
+
+            # Retrieve all (there can be many) buttons
+            # that run command, constructed in generator
+            local cmd_buttons_concat="${__accu_development1_paths_to_cmd_buttons[$p]}"
+            local -a cmd_buttons
+            cmd_buttons=( "${(z@)cmd_buttons_concat}" )
+
+            # Append the buttons
+            local b
+            for b in "${cmd_buttons[@]}"; do
+                [ -z "$b" ] && continue
+                ZACCU_OUTPUT_DOCUMENT_SECTIONS[development1]+=" ${(Q)b}"
+            done
+
+            ZACCU_OUTPUT_DOCUMENT_SECTIONS[development1]+=$'\n'
+        done
+    fi
+
+    # Free memory
+    __accu_development1_paths_to_cmd_buttons=()
+    __accu_development1_paths_as_added_order=()
+}
+
+
+#
+# Actions
+#
+
+__accu_std_action_development1() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
+    zaccu_stdlib_to_cmd_line "cd $active_path"
+}
+
+__accu_action_cmd_development1() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" concat="$5"
+
+    local -a qopts_qpaths
+    qopts_qpaths=( "${(z@)concat}" )
+
+    local opts_concat="${(Q)qopts_qpaths[1]}"
+    local paths_concat="${(Q)qopts_qpaths[2]}"
+
+    local -a opts paths
+    opts=( "${(z@)opts_concat}" )
+    opts=( "${(Q)opts[@]}" )
+    paths=( "${(z@)paths_concat}" )
+    paths=( "${(Q)paths[@]}" )
+
+    if [[ "${#opts}" = "0" || ( "${#opts}" = "1" && "${opts[1]}" = "" ) ]]; then
+        zaccu_stdlib_to_cmd_line "cd $active_path; $cmd ${paths[*]}"
+    else
+        zaccu_stdlib_to_cmd_line "cd $active_path; $cmd ${opts[*]} ${paths[*]}"
+    fi
+}
+
+__accu_action_backup_development1() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5" dest="${ZACCU_CONFIG[development1_backupdir]}"
+
+    zaccu_stdlib_resolve_path "$active_path" "$file"
+    local dir="${reply[1]}" file="${reply[2]}"
+
+    zaccu_stdlib_get_date_and_time_string
+    zaccu_stdlib_to_cmd_line "mkdir -p $dest; cp $dir/$file $dest/${file}_$REPLY"
+}
+
+#
+# Helper variables
+#
+
+# Detects if a cp command already occured (checks
+# for the same options and paths)
+typeset -gA __accu_development1_opts_paths_occured
+
+# Detects whether any content occured
+integer -g __accu_development1_was_content
+
+# Counts number of entries generated
+integer -g __accu_development1_count
+
+# Counts number of tries of adding new command to existing entry
+integer -g __accu_development1_kg_count
+
+# A map from file that occured in commands to buttons with full data
+# of that commands (quoted, concatenated, splittable with (z) flag)
+# Buttons are quoted and appended after space: to extract use (z)
+# flag and then dequote. The buttons look like [cp], [mkdir], etc.
+typeset -gA __accu_development1_paths_to_cmd_buttons
+
+# Array receiving entries (paths) as they are added, allows to
+# obtain most-recent sort order
+typeset -ga __accu_development1_paths_as_added_order
+
+#
+# Mark that the implementation is loaded
+#
+
+typeset -g __accu_development1_loaded=1
+
+# vim: ft=zsh

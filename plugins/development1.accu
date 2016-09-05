@@ -1,0 +1,88 @@
+# Accumulator plugin for development aid. Commands like "cmake
+# -DCMAKE_VERBOSE_MAKEFILE=ON" are routed to specified generator
+# function. However, many other typical shell commands are also
+# routed in order to precisely track what's done in a project
+
+# Plugin functions are run from "accumulator" function, which has
+# emulate -LR zsh, setopt extendedglob. Other code is executed
+# in unknown environment
+
+# This file just registers plugin, doesn't provide implementation
+# - this is done to speed up shell startup time - loading of
+# implementation (*.iaccu file) will be done at first accumulator
+# run
+
+#
+# Register generators for command "make", "cmake", "qmake",
+# "configure", "gcc", "c++", "clang++", "cpp", "git" and more
+#
+
+zaccu_register_plugin "make"           __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "cmake"          __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "qmake"          __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "configure"      __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "gcc"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "c++"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "clang++"        __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "cpp"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "git"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "hg"             __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "svn"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+                                       
+zaccu_register_plugin "cp"             __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "mv"             __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "rm"             __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "stat"           __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "zstat"          __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "chown"          __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "chmod"          __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "mkdir"          __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "rmdir"          __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "ln"             __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "touch"          __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "tar"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "xz"             __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "7z"             __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "gzip"           __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "gunzip"         __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "bzip2"          __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "bunzip2"        __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "zip"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "unzip"          __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "rar"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "unrar"          __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "ssh"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "scp"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "sftp"           __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "readlink"       __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "zsh"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "bash"           __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "yash"           __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "fish"           __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "sort"           __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "head"           __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "tail"           __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "cat"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+# ll, a typical alias, is used in less common situations than ls (ignored for commonnes)
+zaccu_register_plugin "ll"             __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "xxd"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "file"           __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "install"        __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "open"           __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "lsof"           __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "lp"             __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "lpr"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "iconv"          __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "m4"             __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "gm4"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "gcc"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "dirname"        __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "basename"       __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "diff"           __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "patch"          __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "curl"           __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "md5"            __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "shasum"         __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+zaccu_register_plugin "vimdiff"        __accu_initial_generator_development1 __accu_generator_development1 __accu_final_generator_development1
+
+# vim: ft=zsh
