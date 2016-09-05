@@ -1,0 +1,28 @@
+# Accumulator plugin for various shell utils. Commands like
+# "cp ~/.zshrc ~/.zshrc2" are routed to specified generator
+# function.
+
+# Plugin functions are run from "accumulator" function, which has
+# emulate -LR zsh, setopt extendedglob. Other code is executed
+# in unknown environment
+
+# This file just registers plugin, doesn't provide implementation
+# - this is done to speed up shell startup time - loading of
+# implementation (*.iaccu file) will be done at first accumulator
+# run
+
+#
+# Register generators for command "cp", "mv", "rm", "stat", "chown",
+# "chmod", "mkdir", "rmdir"
+#
+
+zaccu_register_plugin "cp" __accu_initial_generator_shellutils1 __accu_generator_shellutils1 __accu_final_generator_shellutils1
+zaccu_register_plugin "mv" __accu_initial_generator_shellutils1 __accu_generator_shellutils1 __accu_final_generator_shellutils1
+zaccu_register_plugin "rm" __accu_initial_generator_shellutils1 __accu_generator_shellutils1 __accu_final_generator_shellutils1
+zaccu_register_plugin "stat" __accu_initial_generator_shellutils1 __accu_generator_shellutils1 __accu_final_generator_shellutils1
+zaccu_register_plugin "chown" __accu_initial_generator_shellutils1 __accu_generator_shellutils1 __accu_final_generator_shellutils1
+zaccu_register_plugin "chmod" __accu_initial_generator_shellutils1 __accu_generator_shellutils1 __accu_final_generator_shellutils1
+zaccu_register_plugin "mkdir" __accu_initial_generator_shellutils1 __accu_generator_shellutils1 __accu_final_generator_shellutils1
+zaccu_register_plugin "rmdir" __accu_initial_generator_shellutils1 __accu_generator_shellutils1 __accu_final_generator_shellutils1
+
+# vim: ft=zsh

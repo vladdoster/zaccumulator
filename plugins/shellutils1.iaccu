@@ -1,0 +1,190 @@
+# Accumulator plugin for VIM. Commands like "vim ~/.zshrc" are
+# routed to specified generator function. The generator creates
+# text with hyperlinks and appends the text to $SECTIONNAME of
+# choice in ZACCU_OUTPUT_DOCUMENT_SECTIONS[$SECTIONNAME] (global
+# hash). Initial and final generators manage header text.
+
+# Plugin functions are run from "accumulator" function, which has
+# emulate -LR zsh, setopt extendedglob. Other code is executed
+# in unknown environment
+
+# This is implementation file - there's no registration here
+
+#
+# Initial generator
+#
+
+# No arguments
+__accu_initial_generator_shellutils1() {
+    ZACCU_OUTPUT_DOCUMENT_SECTIONS[shellutils1]=$'\n'"${ACC_GREEN}Shell utils runs:${ACC_GREEN_E}"$'\n'
+    __accu_shellutils1_was_content=0
+
+    #
+    # Read configuration
+    #
+
+    # Size
+
+    local size
+    zstyle -s ":accumulator:shellutils1" size size || size="20"
+
+    # We run from accumulator, extendedglob is set
+    # <-> is: positive number, including 0
+    [[ "$size" != <-> ]] && size="20"
+
+    ZACCU_CONFIG[shellutils1_size]="$size"
+
+    # Backup dir
+
+    local backup_dir
+    zstyle -s ":accumulator:shellutils1" backup_dir backup_dir || backup_dir="~/.backup"
+    ZACCU_CONFIG[shellutils1_backupdir]="$backup_dir"
+}
+
+
+#
+# Generator
+#
+
+# $1 - present working directory
+# $2 - it's "vim" or "gvim", the command that's invoked
+# $3, $4, ... - arguments passed to vim
+__accu_generator_shellutils1() {
+    local ts="$1" active_path="$2" cmd="$3"
+    local -a args
+    shift 3
+    args=( "$@" )
+
+    integer max_entries="${ZACCU_CONFIG[shellutils1_size]}" finished=0
+
+    local -a paths opts
+    local a
+    for a in "${args[@]}"; do
+        if [[ "$a" = -[[:alnum:]]# || "$a" = --[[:alnum:]]# ]]; then
+            opts+=( "$a" )
+        else
+            paths+=( "$a" )
+        fi
+    done
+
+    # There are extreme cases where this might
+    # be the same for two different paths
+    local check="${(j:,:)opts}.${(j:,:)paths}"
+
+    if [ "$__accu_shellutils1_opts_paths_occured[$check]" != "1" ]; then
+        __accu_shellutils1_was_content=1
+        __accu_shellutils1_opts_paths_occured[$check]="1"
+
+        # Configurable limit on number of entries in the section
+        [[ "$__accu_shellutils1_count" -ge "$max_entries" ]] && finished=1 && break
+        __accu_shellutils1_count=__accu_shellutils1_count+1
+
+        # Concatenate all paths and options in a splittable way
+        local opts_concat="${(j: :)${(q)opts[@]}}"
+        local paths_concat="${(j: :)${(q)paths[@]}}"
+        local concat="${(q)opts_concat} ${(q)paths_concat}"
+
+        reply=()
+
+        # ID, data1, data2, data3, data4, text, handler
+        zaccu_get_std_button "shutils1" 0 "$cmd" "$active_path" "$concat" "$cmd" __accu_std_action_shellutils1
+
+        local p
+        integer count=1
+        for p in "${paths[@]}"; do
+            zaccu_get_std_button "shutils1$count" 0 "$cmd" "$active_path" "${(q)p}" "${(q)p}" __accu_std_action_shellutils1
+            count+=1
+        done
+
+        local line1="${(j: :)reply[@]}"
+        reply=()
+
+        # ID, data1, data2, data3, data4, text, handler
+        zaccu_get_button "shutils1A" 0 "$cmd" "$active_path" "" "CD" __accu_action_cd_shellutils1
+        zaccu_get_button "shutils1B" 0 "$cmd" "$active_path" "$concat" "Backup" __accu_action_backup_shellutils1
+
+        ZACCU_OUTPUT_DOCUMENT_SECTIONS[shellutils1]+=$'\t'"$line1"$'\n\t'"${(j: :)reply[@]}"$'\n\n'
+    fi
+
+    # finished -> 0 (shell true)
+    return $(( 1-finished ))
+}
+
+
+#
+# Final generator
+#
+
+__accu_final_generator_shellutils1() {
+    __accu_shellutils1_opts_paths_occured=()
+    __accu_shellutils1_count=0
+
+    # No content -> remove header
+    if (( __accu_shellutils1_was_content == 0 )); then
+        unset 'ZACCU_OUTPUT_DOCUMENT_SECTIONS[shellutils1]'
+    fi
+}
+
+
+#
+# Actions
+#
+
+__accu_std_action_shellutils1() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" concat="$5"
+
+    local -a qopts_qpaths
+    qopts_qpaths=( "${(z@)concat}" )
+
+    local opts_concat="${(Q)qopts_qpaths[1]}"
+    local paths_concat="${(Q)qopts_qpaths[2]}"
+
+    local -a opts paths
+    opts=( "${(z@)opts_concat}" )
+    opts=( "${(Q)opts[@]}" )
+    paths=( "${(z@)paths_concat}" )
+    paths=( "${(Q)paths[@]}" )
+
+    if [[ "${#opts}" = "0" || ( "${#opts}" = "1" && "${opts[1]}" = "" ) ]]; then
+        zaccu_stdlib_to_cmd_line "cd $active_path; $cmd ${paths[*]}"
+    else
+        zaccu_stdlib_to_cmd_line "cd $active_path; $cmd ${opts[*]} ${paths[*]}"
+    fi
+}
+
+__accu_action_cd_shellutils1() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
+    zaccu_stdlib_to_cmd_line "cd $active_path"
+}
+
+__accu_action_backup_shellutils1() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5" dest="${ZACCU_CONFIG[shellutils1_backupdir]}"
+
+    zaccu_stdlib_resolve_path "$active_path" "$file"
+    local dir="${reply[1]}" file="${reply[2]}"
+
+    zaccu_stdlib_get_date_and_time_string
+    zaccu_stdlib_to_cmd_line "mkdir -p $dest; cp $dir/$file $dest/${file}_$REPLY"
+}
+
+#
+# Helper variables
+#
+
+# Detects if a cp command already occured (checks
+# for the same options and paths)
+typeset -gA __accu_shellutils1_opts_paths_occured
+
+# Detects whether any content occured
+integer -g __accu_shellutils1_was_content
+
+# Counts number of entries generated
+integer -g __accu_shellutils1_count
+
+#
+# Mark that the implementation is loaded
+#
+
+typeset -g __accu_shellutils1_loaded=1
+
+# vim: ft=zsh
