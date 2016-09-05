@@ -33,83 +33,90 @@ __mytrackinghook() {
     [[ "$cmd" = "bindkey" || "$cmd" = "zle" || "$cmd" = "integer" || "$cmd" = "time" || "$cmd" = "type" ]] && continue
     [[ "$cmd" = "autoload" || "$cmd" = "tig" ]] && continue
 
-    # Its arguments
+    # Command's arguments
     local -a args
     shift
     args=( "$@" )
 
-    # Here to-save arguments will be remembered
+    # Here arguments will be remembered
     local -a save_args
+    save_args=()
 
-    local a
-    integer store
+    local a active_path=""
+    integer that_file_existed any_existed=0
     for a in "${args[@]}"; do
-        # Skip options, store them for possible save
+        # Recognize options, store them immediately for possible command save
         [[ "$a" = -[[:alnum:]]# || "$a" = --[[:alnum:]]# ]] && { save_args+=( "$a" ); continue; }
 
-        store=0
+        that_file_existed=0
 
-        # Possible "cd ..", etc.
-        [[ "$a" = ".." || "$a" = "." || "$a" = "/" ]] && continue
+        # Possible "cd ..", etc. - NO SAVING
+        [[ "$a" = ".." || "$a" = "." || "$a" = "/" ]] && break
 
-        # I have ~/diff file, and git diff ... yields a false hit
+        # Save file name argument with quoting, trying to
+        # mimick how user would quote it, e.g.: a\ file.txt
+        save_args+=( "${(q)${a:t}}" )
+
+        # I have ~/diff file, and git diff ... yields a false hit - NO PROCESSING
         [[ "$cmd" = "git" && "$a" = "diff" ]] && continue
         [[ "$cmd" = "git" && "$a" = "status" ]] && continue
 
-        # Does this look like an absolute path?
-        if [[ "${a[1]}" = "/" ]]; then
-            if [[ -e "$a" ]]; then
-                # Command is suitable for storing in input.db
-                store=1
+        # Looking for a first existing path, following aren't checked
+        if [ "$any_existed" = "0" ]; then
+            # Does this look like an absolute path?
+            if [[ "${a[1]}" = "/" ]]; then
+                if [[ -e "$a" ]]; then
+                    # Command is suitable for storing in input.db
+                    that_file_existed=1
+                fi
+            # Does this look like absolute path with ~ ?
+            elif [[ "${a[1]}" = "~" ]]; then
+                a="${a/#\~/$HOME}"
+                if [[ -e "$a" ]]; then
+                    # Command is suitable for storing in input.db
+                    that_file_existed=1
+                fi
+            # Does the path work when prepended with $HOME?
+            # Exclude some possible basic files
+            elif [[ -e "$HOME/$a" && "$a" != "1" && "$a" != "2" && "$a" != "3" ]]; then
+                a="$HOME/$a"
+                that_file_existed=1
             fi
-        # Does this look like absolute path with ~ ?
-        elif [[ "${a[1]}" = "~" ]]; then
-            a="${a/#\~/$HOME}"
-            if [[ -e "$a" ]]; then
-                # Command is suitable for storing in input.db
-                store=1
-            fi
-        # Does the path work when prepended with $HOME?
-        # Exclude some possible basic files
-        elif [[ -e "$HOME/$a" && "$a" != "1" && "$a" != "2" && "$a" != "3" ]]; then
-            a="$HOME/$a"
-            store=1
         fi
 
-        # Store the command?
-        if [ "$store" = "1" ]; then
-            # We will save command with only one non-option argument
-            save_args+=( "${(q)${a:t}}" )
+        # Store the file argument?
+        if [[ "$that_file_existed" = "1" && "$any_existed" = "0" ]]; then
+            any_existed=1
 
-            # Simulate that working directory
-            # is where the file is located
-            local wd="${(q)${a:h}}"
-            local cmd_with_params="${(q)cmd} ${(j: :)save_args[@]}"
-
-            # Here we have: non-option argument - quoted, working
-            # directory - quoted, cmd in cmd_with_params - quoted
-            # - as if user enterred it (except that (q) works more
-            # extensively than typical user quoting)
-
-            # Don't use any command twice
-            [ "${already_hits[$cmd_with_params]}" = "1" ] && break
-            already_hits[$cmd_with_params]="1"
-
-            echo "${fg_bold[yellow]}Hit:$reset_color $cmd_with_params"
-
-            wd="${(q)wd}"
-            # Now is quoting for data storage - not for simulation of user input
-            cmd_with_params="${(q)cmd_with_params}"
-            wd="${(q)wd}"
-            print -r -- "0 $wd $cmd_with_params $cmd_with_params" >> "${ZACCU_CONFIG_DIR}/data/input.db"
-
-            current_done=current_done+1
-            [[ "$current_done" -ge "$todo" ]] && echo "${fg_bold[green]}Gathered $todo commands, exiting$reset_color" && return 0
-
-            # Command saved, leave
-            break
+            # First existing file argument will be used for working directory
+            # Simulated working directory is where the file is located
+            active_path="${a:h}"
         fi
     done
+
+    if (( any_existed )); then
+        local wd="${(q)active_path}"
+        local cmd_with_params="${(q)cmd} ${(j: :)save_args[@]}"
+
+        # Here we have: non-option arguments - quoted, working
+        # directory - quoted, command in cmd_with_params - quoted
+        # - as if user enterred the line (except that (q) works
+        # more extensively than typical user quoting)
+
+        # Don't use any command twice
+        [ "${already_hits[$cmd_with_params]}" = "1" ] && return 1
+        already_hits[$cmd_with_params]="1"
+
+        echo "${fg_bold[yellow]}Hit:$reset_color $cmd_with_params"
+
+        # Quoting for data storage - not for simulation of user input
+        wd="${(q)wd}"
+        cmd_with_params="${(q)cmd_with_params}"
+        print -r -- "0 $wd $cmd_with_params $cmd_with_params" >> "${ZACCU_CONFIG_DIR}/data/input.db"
+
+        current_done+=1
+        [[ "$current_done" -ge "$todo" ]] && echo "${fg_bold[green]}Gathered $todo commands, exiting$reset_color" && return 0
+    fi
 
     return 1
 }
