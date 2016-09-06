@@ -13,6 +13,11 @@ zstyle ":accumulator" time_limit "500"                      # Start no later tha
 zstyle ":accumulator:tracking" fork "0"                     # To obtain time stamp, use zsh/datetime module, if 1 then use date command
 zstyle ":accumulator:tracking" proj_discovery_nparents "4"  # How many parent directories to check when determining if command is ran inside a project
 
+\# Which files and directories change owning directory into a project
+zstyle ":accumulator:tracking" project_starters .git .hg Makefile CMakeLists.txt configure SConstruct \*.pro \*.xcodeproj \*.cbp \*.kateproject \*.plugin.zsh
+\# Which files and directories change owning directory into a unit if only there is a project in a parent directory
+zstyle ":accumulator:tracking" unit_starters Makefile CMakeLists.txt \*.pro
+
 # Vim plugin
 zstyle ":accumulator:vim1" size "20"                        # Limits number of Vim entries
 zstyle ":accumulator:vim1" backup_dir "~/.backup"           # Sets backup directory (for backup action of Vim plugin)

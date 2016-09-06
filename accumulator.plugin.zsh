@@ -32,10 +32,10 @@ autoload zaccu-process-buffer zaccu-usetty-wrapper zaccu-list zaccu-list-input z
 mkdir -p "${ZACCU_CONFIG_DIR}/data"
 
 __trackinghook() {
+    local -F SECONDS
+    local -F start_time="$SECONDS"
+
     local first second
-    # Simlate as-from-input quoting on PWD
-    # by additional (q) – as if user entered
-    # the path with backslashes
     first="${(q)${(q)PWD}}"
     second="${(q)1}"
     third="${(q)2}"
@@ -55,69 +55,81 @@ __trackinghook() {
         ts="$( date +%s )"
     fi
 
-    ##
-    # Check if we are in a project – by detecting .git dir,
-    # files: Makefile, CMakeLists.txt, configure, etc.
-    ##
-
-    local proj_discovery_nparents
+    local proj_discovery_nparents time_limit
+    local -a project_starters unit_starters
     zstyle -s ":accumulator:tracking" proj_discovery_nparents proj_discovery_nparents || proj_discovery_nparents=4
+    zstyle -s ":accumulator:tracking" time_limit time_limit || time_limit="150"
+    zstyle -a ":accumulator:tracking" project_starters project_starters \
+        || project_starters=( .git .hg Makefile CMakeLists.txt configure SConstruct \*.pro \*.xcodeproj \*.cbp \*.kateproject \*.plugin.zsh )
+    zstyle -a ":accumulator:tracking" unit_starters unit_starters_str || unit_starters=( Makefile CMakeLists.txt \*.pro )
 
-    local look_in="$PWD" marks="" saved_marks
-    local -a tmp
-    integer PROJECT=0 SUBPROJECT=0 is_git
+    # A map of possible project files into compact mark
+    local -A pfile_to_mark
+    pfile_to_mark=( ".git" "GIT" ".hg" "HG" "Makefile" "MAKEFILE" "CMakeLists.txt" "CMAKELISTS"
+                    "configure" "CONFIGURE" "SConstruct" "SCONSTRUCT" "*.pro" "PRO" "*.xcodeproj" "XCODE"
+                    "*.cbp" "CBP" "*.kateproject" "KATE" "*.plugin.zsh" "ZSHPLUGIN" )
+
+    local look_in="$PWD" ps
+    local -a tmp subtract entries paths marks
+    integer current_entry=1 result
+
     # -ge not -gt -> one run of the loop more than *_nparents,
-    # for PWD check, i.e. of current, not parent directory
-    while [[ "$proj_discovery_nparents" -ge 0 && "$look_in" != "/" ]]; do
+    while [[ "$proj_discovery_nparents" -ge 0 && "$look_in" != "/" && "$look_in" != "$HOME" ]]; do
         (( proj_discovery_nparents = proj_discovery_nparents - 1 ))
 
-        is_git=0
-        [ -e "$look_in/.git" ] && marks+="GIT:1:" && is_git=1
-        [ -e "$look_in/Makefile" ] && marks+="MAKEFILE:1:"
-        [ -e "$look_in/CMakeLists.txt" ] && marks+="CMAKELISTS.TXT:1:"
-        [ -e "$look_in/configure" ] && marks+="CONFIGURE:1:"
-        [ -e "$look_in/SConstruct" ] && marks+="SCONSTRUCT:1:"
-
-        tmp=( "$look_in"/*.pro(NY1) )
-        [ "${#tmp}" != "0" ] && marks+="PRO:1:"
-        tmp=( "$look_in"/*.xcodeproj(NY1) )
-        [ "${#tmp}" != "0" ] && marks+="XCODEPROJ:1:"
-        tmp=( "$look_in"/*.cbp(NY1) )
-        [ "${#tmp}" != "0" ] && marks+="CBP:1:"
-
-        if [ -n "$marks" ]; then
-            if [ "$PROJECT" = "1" ]; then
-                marks=""
-                # Guard typical possible accident:
-                # Makefile or .git, etc. in $HOME
-                if [ "$look_in" != "$HOME" ]; then
-                    SUBPROJECT=1
-                    saved_marks+="SUBPROJECT:1:"
-
-                    # Mark that there is an outer git repo
-                    (( is_git )) && saved_marks+="OGIT:1:"
-
-                    # No save of outer project's marks
-                    break;
-                fi
+        for ps in "${project_starters[@]}"; do
+            (( (SECONDS-start_time)*1000 > time_limit )) && echo "${fg_bold[red]}TRACKING ABORTED, TOO SLOW${reset_color}" && break 2
+            result=0
+            if [ "${ps/\*/}" != "$ps" ]; then
+                tmp=( $look_in/$~ps(NY1) )
+                [ "${#tmp}" != "0" ] && result=1
             else
-                # Guard typical possible accident:
-                # Makefile or .git, etc. in $HOME
-                if [ "$look_in" != "$HOME" ]; then
-                    PROJECT=1
-                    saved_marks="${marks}PROJECT:1:"
-                fi
-                marks=""
+                [ -e "$look_in/$ps" ] && result=1
             fi
+
+            if (( result )); then
+                entries[current_entry]="project"
+                paths[current_entry]="$look_in"
+                if (( ${+pfile_to_mark[$ps]} )); then
+                    marks[current_entry]="${marks[current_entry]}${pfile_to_mark[$ps]}:1:"
+                else
+                    marks[current_entry]="${marks[current_entry]}NEW:$ps:"
+                fi
+            fi
+        done
+
+        if [ "${entries[current_entry]}" = "project" ]; then
+            if [[ "$current_entry" -gt "1" ]]; then
+                entries[current_entry-1]="subproject"
+                # Check if previous entry will have any unit_starters
+                # and will not have project_starters:|unit_starters
+                tmp=( ${paths[current_entry-1]}/$^~unit_starters(NY1) )
+                if [ "${#tmp}" != "0" ]; then
+                    subtract=( "${(@)project_starters:|unit_starters}" )
+                    tmp=( ${paths[current_entry-1]}/$^~subtract(NY1) )
+
+                    if [ "${#tmp}" = "0" ]; then
+                        # We have unit_starters-only project, turn it into unit
+                        entries[current_entry-1]="unit"
+                    fi
+                fi
+            fi
+
+            current_entry+=1
         fi
+
         look_in="${look_in:h}"
     done
 
-    # Queries will do :KEY: string search
-    [ -n "$saved_marks" ] && saved_marks=":$saved_marks"
+    integer count=${#entries} i
+    local -a variadic
+    for (( i=1; i<=count; i ++ )); do
+        variadic+=( "${(q)entries[i]}" "${(q)paths[i]}" ":${(q)marks[i]}" )
+    done
 
-    # Empty saved_marks will become: ''
-    print -r -- "$ts $first $second $third ${(q)saved_marks}" >> "${ZACCU_CONFIG_DIR}/data/input.db"
+    print -r -- "$ts $first $second $third ${variadic[*]}" >> "${ZACCU_CONFIG_DIR}/data/input.db"
+
+    [ "$ZACCU_DEBUG" = "1" ] && local t=$(( SECONDS - start_time )) && echo preexec ran ${t[1,5]}s
 }
 
 autoload add-zsh-hook
