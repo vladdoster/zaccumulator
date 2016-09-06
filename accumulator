@@ -34,18 +34,20 @@ function -zaccu_run_initial_generators() {
 }
 
 #
-# Runs generator for given command ($3) and its
-# arguments ($4, $5, ...). The generator ran will
+# Runs generator for given command ($4) and its
+# arguments ($5, $6, ...). The generator ran will
 # build ZACCU_OUTPUT_DOCUMENT_SECTIONS sections,
 # i.e. entries of the hash, which are text, with
 # hyperlinks.
 #
 # Requested and used is also $2 - $PWD at the time
 # when the command is being run, and $1 - time
-# stamp of that moment
+# stamp of that moment. Also, the general purpose
+# marks are passed around, currently with project
+# information
 #
 function -zaccu_run_generator() {
-    local ts="$1" active_path="$2" cmd="$3"
+    local ts="$1" active_path="$2" marks="$3" cmd="$4"
     integer exit_codes=0
 
     if [[ -n "$cmd" && -n "${ZACCU_PLUGS_TEXT_GENERATORS[$cmd]}" ]]; then
@@ -136,11 +138,12 @@ input_arr=( "${(Oa)input_arr[@]}" )
 
 # TODO: detect active path modification inside one command set
 for entry in "${input_arr[@]}"; do
-    local -a data_pack ts active_path copy_of_input
+    local -a data_pack ts active_path copy_of_input marks
     data_pack=( "${(@z)entry}" )
     ts="${data_pack[1]}"
     active_path="${(Q)data_pack[2]}"
     copy_of_input="${(Q)data_pack[3]}"
+    marks="${(Q)data_pack[5]}"
 
     local -a command_set
     # What's enterred on command line, is to be dequoted
@@ -190,7 +193,7 @@ for entry in "${input_arr[@]}"; do
             fi
 
             # Run generator
-            -zaccu_run_generator "$ts" "$active_path" "${(@)command_set[$selected_idx,$last_idx]}"
+            -zaccu_run_generator "$ts" "$active_path" "$marks" "${(@)command_set[$selected_idx,$last_idx]}"
 
             cmd=""
             selected_idx=0
@@ -200,7 +203,7 @@ for entry in "${input_arr[@]}"; do
 
     # Last command, without ";" at the end of it
     if [[ "$selected_idx" -ne "0" ]]; then
-        -zaccu_run_generator "$ts" "$active_path" "${(@)command_set[$selected_idx,-1]}"
+        -zaccu_run_generator "$ts" "$active_path" "$marks" "${(@)command_set[$selected_idx,-1]}"
     fi
 done
 

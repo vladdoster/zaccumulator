@@ -66,9 +66,9 @@ __accu_initial_generator_shellutils1() {
 # $2 - it's "vim" or "gvim", the command that's invoked
 # $3, $4, ... - arguments passed to vim
 __accu_generator_shellutils1() {
-    local ts="$1" active_path="$2" cmd="$3"
+    local ts="$1" active_path="$2" marks="$3" cmd="$4"
     local -a args
-    shift 3
+    shift 4
     args=( "$@" )
 
     integer max_entries="${ZACCU_CONFIG[shellutils1_size]}" keep_going="${ZACCU_CONFIG[shellutils1_keep_going]}" finished=0
