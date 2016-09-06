@@ -7,6 +7,7 @@ The values being set are the defaults.
 zstyle ":accumulator" bold "0"                              # Draw interface with no bold
 zstyle ":accumulator" colorpair "white/black"               # Text white, background black. Zsh 5.3 supports 254 numbers, e.g. 10/17
 zstyle ":accumulator" border "1"                            # Draw border around main and status windows
+zstyle ":accumulator" time_limit "500"                      # Start no later than after 500 milliseconds, skipping input data if necessary
 
 # Tracking
 zstyle ":accumulator:tracking" fork "0"                     # To obtain time stamp, use zsh/datetime module, if 1 then use date command

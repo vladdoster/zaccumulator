@@ -116,6 +116,14 @@ function -zaccu_load_implementation() {
 ## Main code
 ##
 
+# Measure and limit generation time
+typeset -F SECONDS=0.0
+local -F start_seconds=$SECONDS
+local limit_seconds
+zstyle -s ":accumulator" time_limit limit_seconds || limit_seconds="500"
+[[ "$limit_seconds" != <-> ]] && limit_seconds="500"
+
+# Business logic follows
 local curcontext=":zle:$WIDGET"
 local MATCH MBEGIN MEND
 local input_db_path="$HOME/.config/accumulator/data/input.db"
@@ -138,6 +146,8 @@ input_arr=( "${(Oa)input_arr[@]}" )
 
 # TODO: detect active path modification inside one command set
 for entry in "${input_arr[@]}"; do
+    (( (SECONDS - start_seconds) * 1000 >= limit_seconds )) && break
+
     local -a data_pack ts active_path copy_of_input marks
     data_pack=( "${(@z)entry}" )
     ts="${data_pack[1]}"
