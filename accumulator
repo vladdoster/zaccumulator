@@ -233,6 +233,9 @@ done
 # Jumping over headers with [ and ]
 ZACCULIST_HOP_INDEXES=( "${ZACCULIST_NONSELECTABLE_ELEMENTS[@]}" )
 
+local ZACCULIST_GENERATION_TIME="$(( SECONDS - start_seconds ))"
+ZACCULIST_GENERATION_TIME="${ZACCULIST_GENERATION_TIME[1,5]}"
+
 local ZACCULIST_WRAPPER_BIT=""
 zaccu-usetty-wrapper zaccu-list-wrapper "${(@f)${text%$'\n'}}"
 
