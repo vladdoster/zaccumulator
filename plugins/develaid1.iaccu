@@ -17,9 +17,9 @@
 #
 
 # No arguments
-__accu_initial_generator_development1() {
-    ZACCU_OUTPUT_DOCUMENT_SECTIONS[development1]=$'\n'"${ACC_GREEN}DEVELOPMENT:${ACC_GREEN_E}"$'\n'
-    __accu_development1_was_content=0
+__accu_initial_generator_develaid1() {
+    ZACCU_OUTPUT_DOCUMENT_SECTIONS[develaid1]=$'\n'"${ACC_GREEN}DEVELOPMENT:${ACC_GREEN_E}"$'\n'
+    __accu_develaid1_was_content=0
 
     #
     # Read configuration
@@ -28,33 +28,33 @@ __accu_initial_generator_development1() {
     ### Size - max number of entries in generated section
 
     local size
-    zstyle -s ":accumulator:development1" size size || size="15"
+    zstyle -s ":accumulator:develaid1" size size || size="15"
 
     # We run from accumulator, extendedglob is set
     # <-> is: positive number, including 0
     [[ "$size" != <-> ]] && size="20"
 
-    ZACCU_CONFIG[development1_size]="$size"
+    ZACCU_CONFIG[develaid1_size]="$size"
 
     ### Keep going - try `keep_going`-times to add command to any existing entry, after reaching max # of entries
 
     local keep_going
-    zstyle -s ":accumulator:development1" keep_going keep_going || keep_going="100"
+    zstyle -s ":accumulator:develaid1" keep_going keep_going || keep_going="100"
 
     [[ "$keep_going" != <-> ]] && keep_going="100"
 
-    ZACCU_CONFIG[development1_keep_going]="$keep_going"
+    ZACCU_CONFIG[develaid1_keep_going]="$keep_going"
 
     ### Backup dir
 
     local backup_dir
-    zstyle -s ":accumulator:development1" backup_dir backup_dir || backup_dir="~/.backup"
-    ZACCU_CONFIG[development1_backupdir]="$backup_dir"
+    zstyle -s ":accumulator:develaid1" backup_dir backup_dir || backup_dir="~/.backup"
+    ZACCU_CONFIG[develaid1_backupdir]="$backup_dir"
 
     ### Sort order
     local sort_order
-    zstyle -s ":accumulator:development1" sort_order sort_order || sort_order="recent_first"
-    ZACCU_CONFIG[development1_sort_order]="$sort_order"
+    zstyle -s ":accumulator:develaid1" sort_order sort_order || sort_order="recent_first"
+    ZACCU_CONFIG[develaid1_sort_order]="$sort_order"
 }
 
 
@@ -65,18 +65,18 @@ __accu_initial_generator_development1() {
 # $1 - present working directory
 # $2 - it's "vim" or "gvim", the command that's invoked
 # $3, $4, ... - arguments passed to vim
-__accu_generator_development1() {
+__accu_generator_develaid1() {
     local ts="$1" active_path="$2" marks="$3" cmd="$4"
     local -a args
     shift 4
     args=( "$@" )
 
-    integer max_entries="${ZACCU_CONFIG[development1_size]}" keep_going="${ZACCU_CONFIG[development1_keep_going]}" finished=0
+    integer max_entries="${ZACCU_CONFIG[develaid1_size]}" keep_going="${ZACCU_CONFIG[develaid1_keep_going]}" finished=0
 
     # Configurable limit on number of entries in the section
-    if [[ "$__accu_development1_count" -ge "$max_entries" ]]; then
+    if [[ "$__accu_develaid1_count" -ge "$max_entries" ]]; then
         # Are we in keep going state?
-        if [[ "$__accu_development1_kg_count" -ge "$keep_going" ]]; then
+        if [[ "$__accu_develaid1_kg_count" -ge "$keep_going" ]]; then
             # Keep going is also finished -> general finished state
             finished=1
             return $(( 1-finished ))
@@ -87,7 +87,7 @@ __accu_generator_development1() {
         # against processing whole database striving for
         # a new command for existing entry. Still allows
         # to influence number of commands in entries.
-        __accu_development1_kg_count+=1
+        __accu_develaid1_kg_count+=1
     fi
 
     local -a paths opts
@@ -105,9 +105,9 @@ __accu_generator_development1() {
     # be the same for two different paths
     local check="${(j:,:)opts}.${(j:,:)paths}"
 
-    if [ "$__accu_development1_opts_paths_occured[$check]" != "1" ]; then
-        __accu_development1_was_content=1
-        __accu_development1_opts_paths_occured[$check]="1"
+    if [ "$__accu_develaid1_opts_paths_occured[$check]" != "1" ]; then
+        __accu_develaid1_was_content=1
+        __accu_develaid1_opts_paths_occured[$check]="1"
 
         # Concatenate all paths and options in a (z)-splittable way
         local opts_concat="${(j: :)${(q)opts[@]}}"
@@ -128,7 +128,7 @@ __accu_generator_development1() {
         # that full command in status window.
         #
         # ID, data1, data2, data3, data4, text, handler
-        zaccu_get_button "shutils1A" "-1" "$cmd" "$active_path" "$concat" "${ACC_CYAN}${cmd}${ACC_CYAN_E}" __accu_action_cmd_development1
+        zaccu_get_button "shutils1A" "-1" "$cmd" "$active_path" "$concat" "${ACC_CYAN}${cmd}${ACC_CYAN_E}" __accu_action_cmd_develaid1
         local quoted_button="${(q)reply[1]}" p
         for p in "${paths[@]}"; do
             # Dequote $active_path and $p that come from input with quoting
@@ -138,16 +138,16 @@ __accu_generator_development1() {
             zaccu_stdlib_resolve_path "${(Q)active_path}" "${(Q)p}"
             local resolved_path="${(q)reply[1]}/${(q)reply[2]}"
 
-            if (( ${+__accu_development1_paths_to_cmd_buttons[$resolved_path]} == 0 )); then
+            if (( ${+__accu_develaid1_paths_to_cmd_buttons[$resolved_path]} == 0 )); then
                 # New entry - only when entries limit isn't reached
-                if [[ "$__accu_development1_count" -lt "$max_entries" ]]; then
-                    __accu_development1_count+=1
-                    __accu_development1_paths_to_cmd_buttons[$resolved_path]="${__accu_development1_paths_to_cmd_buttons[$resolved_path]} ${quoted_button}"
-                    __accu_development1_paths_as_added_order+=( "$resolved_path" )
+                if [[ "$__accu_develaid1_count" -lt "$max_entries" ]]; then
+                    __accu_develaid1_count+=1
+                    __accu_develaid1_paths_to_cmd_buttons[$resolved_path]="${__accu_develaid1_paths_to_cmd_buttons[$resolved_path]} ${quoted_button}"
+                    __accu_develaid1_paths_as_added_order+=( "$resolved_path" )
                 fi
             else
                 # Existing entry - if we are here then keep_going limit isn't reached
-                __accu_development1_paths_to_cmd_buttons[$resolved_path]="${__accu_development1_paths_to_cmd_buttons[$resolved_path]} ${quoted_button}"
+                __accu_develaid1_paths_to_cmd_buttons[$resolved_path]="${__accu_develaid1_paths_to_cmd_buttons[$resolved_path]} ${quoted_button}"
             fi
         done
     fi
@@ -161,21 +161,21 @@ __accu_generator_development1() {
 # Final generator
 #
 
-__accu_final_generator_development1() {
-    __accu_development1_opts_paths_occured=()
-    __accu_development1_count=0
-    __accu_development1_kg_count=0
+__accu_final_generator_develaid1() {
+    __accu_develaid1_opts_paths_occured=()
+    __accu_develaid1_count=0
+    __accu_develaid1_kg_count=0
 
-    if (( __accu_development1_was_content == 0 )); then
+    if (( __accu_develaid1_was_content == 0 )); then
         # No content -> remove header
-        unset 'ZACCU_OUTPUT_DOCUMENT_SECTIONS[development1]'
+        unset 'ZACCU_OUTPUT_DOCUMENT_SECTIONS[develaid1]'
     else
         # Establish sort order
         local -a sorted_resolved_paths
-        if [ "${ZACCU_CONFIG[development1_sort_order]}" = "file_locations" ]; then
-            sorted_resolved_paths=( "${(no)__accu_development1_paths_as_added_order[@]}" )
+        if [ "${ZACCU_CONFIG[develaid1_sort_order]}" = "file_locations" ]; then
+            sorted_resolved_paths=( "${(no)__accu_develaid1_paths_as_added_order[@]}" )
         else
-            sorted_resolved_paths=( "${__accu_development1_paths_as_added_order[@]}" )
+            sorted_resolved_paths=( "${__accu_develaid1_paths_as_added_order[@]}" )
         fi
 
         # Output entries
@@ -198,17 +198,17 @@ __accu_final_generator_development1() {
 
             # Standard action - FileCD
             # ID, data1, data2, data3, data4, text, handler
-            zaccu_get_std_button "shutils1" 0 "/FileCD/" "$dir" "$file" "$txtfile" __accu_std_action_development1
+            zaccu_get_std_button "shutils1" 0 "/FileCD/" "$dir" "$file" "$txtfile" __accu_std_action_develaid1
 
             # Backup - second custom action (first is running
             # of command, constructed in generator)
-            zaccu_get_button "shutils1B" 0 "/Backup/" "$dir" "$file" "Backup" __accu_action_backup_development1
+            zaccu_get_button "shutils1B" 0 "/Backup/" "$dir" "$file" "Backup" __accu_action_backup_develaid1
 
-            ZACCU_OUTPUT_DOCUMENT_SECTIONS[development1]+=$'\t'"${reply[1]}"$'\t'"${reply[2]}"
+            ZACCU_OUTPUT_DOCUMENT_SECTIONS[develaid1]+=$'\t'"${reply[1]}"$'\t'"${reply[2]}"
 
             # Retrieve all (there can be many) buttons
             # that run command, constructed in generator
-            local cmd_buttons_concat="${__accu_development1_paths_to_cmd_buttons[$p]}"
+            local cmd_buttons_concat="${__accu_develaid1_paths_to_cmd_buttons[$p]}"
             local -a cmd_buttons
             cmd_buttons=( "${(z@)cmd_buttons_concat}" )
 
@@ -216,16 +216,16 @@ __accu_final_generator_development1() {
             local b
             for b in "${cmd_buttons[@]}"; do
                 [ -z "$b" ] && continue
-                ZACCU_OUTPUT_DOCUMENT_SECTIONS[development1]+=" ${(Q)b}"
+                ZACCU_OUTPUT_DOCUMENT_SECTIONS[develaid1]+=" ${(Q)b}"
             done
 
-            ZACCU_OUTPUT_DOCUMENT_SECTIONS[development1]+=$'\n'
+            ZACCU_OUTPUT_DOCUMENT_SECTIONS[develaid1]+=$'\n'
         done
     fi
 
     # Free memory
-    __accu_development1_paths_to_cmd_buttons=()
-    __accu_development1_paths_as_added_order=()
+    __accu_develaid1_paths_to_cmd_buttons=()
+    __accu_develaid1_paths_as_added_order=()
 }
 
 
@@ -233,12 +233,12 @@ __accu_final_generator_development1() {
 # Actions
 #
 
-__accu_std_action_development1() {
+__accu_std_action_develaid1() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5"
     zaccu_stdlib_to_cmd_line "cd $active_path"
 }
 
-__accu_action_cmd_development1() {
+__accu_action_cmd_develaid1() {
     local id="$1" ts="$2" cmd="$3" active_path="$4" concat="$5"
 
     local -a qopts_qpaths
@@ -260,8 +260,8 @@ __accu_action_cmd_development1() {
     fi
 }
 
-__accu_action_backup_development1() {
-    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5" dest="${ZACCU_CONFIG[development1_backupdir]}"
+__accu_action_backup_develaid1() {
+    local id="$1" ts="$2" cmd="$3" active_path="$4" file="$5" dest="${ZACCU_CONFIG[develaid1_backupdir]}"
 
     zaccu_stdlib_resolve_path "$active_path" "$file"
     local dir="${reply[1]}" file="${reply[2]}"
@@ -276,31 +276,31 @@ __accu_action_backup_development1() {
 
 # Detects if a cp command already occured (checks
 # for the same options and paths)
-typeset -gA __accu_development1_opts_paths_occured
+typeset -gA __accu_develaid1_opts_paths_occured
 
 # Detects whether any content occured
-integer -g __accu_development1_was_content
+integer -g __accu_develaid1_was_content
 
 # Counts number of entries generated
-integer -g __accu_development1_count
+integer -g __accu_develaid1_count
 
 # Counts number of tries of adding new command to existing entry
-integer -g __accu_development1_kg_count
+integer -g __accu_develaid1_kg_count
 
 # A map from file that occured in commands to buttons with full data
 # of that commands (quoted, concatenated, splittable with (z) flag)
 # Buttons are quoted and appended after space: to extract use (z)
 # flag and then dequote. The buttons look like [cp], [mkdir], etc.
-typeset -gA __accu_development1_paths_to_cmd_buttons
+typeset -gA __accu_develaid1_paths_to_cmd_buttons
 
 # Array receiving entries (paths) as they are added, allows to
 # obtain most-recent sort order
-typeset -ga __accu_development1_paths_as_added_order
+typeset -ga __accu_develaid1_paths_as_added_order
 
 #
 # Mark that the implementation is loaded
 #
 
-typeset -g __accu_development1_loaded=1
+typeset -g __accu_develaid1_loaded=1
 
 # vim: ft=zsh
