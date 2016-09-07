@@ -70,7 +70,7 @@ for (( i=1; i<=nwords; i++ )); do
     buf="${buf#(#m)$word}"
 
     # If shell word not found, return. This shoudln't happen
-    [ -z "$MATCH" ] && return 0
+    [ -z "$MATCH" ] && return 1
 
     # Spaces point to previous shell word
     # Visual cursor right after spaces (-ge) -> not enough to select previous word (-gt required)
