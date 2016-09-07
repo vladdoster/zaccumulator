@@ -95,4 +95,7 @@ word="${ZACCU_PB_WORDS[ZACCU_PB_SELECTED_WORD]}"
 ZACCU_PB_LEFT="${word[1,diff]}"
 ZACCU_PB_RIGHT="${word[diff+1,-1]}"
 
+# This function should be tested
+return 0
+
 # vim:ft=zsh
