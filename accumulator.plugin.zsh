@@ -47,7 +47,7 @@ __trackinghook() {
 
     local fork ts
     zstyle -b ":accumulator:tracking" fork fork || fork="no"
-    [ "$fork" = "no" ] && fork=0 || fork=1
+    [ "$fork" = "yes" ] && fork=1 || fork=0
 
     if [ "$fork" = "0" ]; then
         [[ "${+modules}" = 1 && "${modules[zsh/datetime]}" != "loaded" && "${modules[zsh/datetime]}" != "autoloaded" ]] && zmodload zsh/datetime
