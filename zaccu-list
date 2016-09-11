@@ -255,10 +255,11 @@ cursor_state=( "main" 1 "status" 1 )
 # Load configuration
 local colorpair border bold
 zstyle -s ":accumulator" colorpair colorpair
-zstyle -s ":accumulator" border border
-zstyle -s ":accumulator" bold bold
+zstyle -b ":accumulator" border border
+zstyle -b ":accumulator" bold bold
 [ "$colorpair" = "" ] && colorpair="white/black"
-[ "$border" = "0" ] || border="1"
+[ "$border" = "no" ] && border="0" || border="1"
+[ "$bold" = "yes" ] && bold="1" || bold="0"
 local background="${colorpair#*/}"
 local backuptheme="$colorpair/$bold"
 zcurses bg "$wname_main" "$colorpair"
