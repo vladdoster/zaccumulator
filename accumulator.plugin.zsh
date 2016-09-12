@@ -32,6 +32,10 @@ autoload zaccu-process-buffer zaccu-usetty-wrapper zaccu-list zaccu-list-input z
 mkdir -p "${ZACCU_CONFIG_DIR}/data"
 
 __trackinghook() {
+    # Trust own CPU-time limiting SECONDS-based mechanism,
+    # block Ctrl-C. Also, any infinite loop is impossible
+    setopt localtraps; trap '' INT
+
     local -F SECONDS
     local -F start_time="$SECONDS"
     local -F start_time="$SECONDS" diff
