@@ -57,7 +57,9 @@ __trackinghook() {
         [[ "${+modules}" = 1 && "${modules[zsh/datetime]}" != "loaded" && "${modules[zsh/datetime]}" != "autoloaded" ]] && zmodload zsh/datetime
         [ "${+modules}" = 0 ] && zmodload zsh/datetime
         ts="$EPOCHSECONDS"
-    else
+    fi
+    # Also a fallback
+    if [[ "$fork" = "1" || -z "$ts" || "$ts" = "0" ]]; then
         ts="$( date +%s )"
     fi
 
