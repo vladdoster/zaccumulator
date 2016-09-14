@@ -42,14 +42,14 @@ function -zaccu_run_initial_generators() {
 #
 # Requested and used is also $2 - $PWD at the time
 # when the command is being run, and $1 - time
-# stamp of that moment. Also, in appropiate scope
-# a parameter ZACCU_OTHER_VARIADIC_DATA is available
-# for plugins, containing variable number of elements
-# read from input.db, occuring after fixed, defined
-# elements
+# stamp of that moment. Also, $3 - ZCONVEY_ID, $4 -
+# $ZCONVEY_NAME. Also, in appropiate scope parameter
+# ZACCU_OTHER_VARIADIC_DATA is available for plugins,
+# containing variable number of elements read from
+# input.db, occuring after fixed, defined elements
 #
 function -zaccu_run_generator() {
-    local ts="$1" active_path="$2" cmd="$3"
+    local ts="$1" active_path="$2" convey_id="$3" convey_name="$4" cmd="$5"
     integer exit_codes=0
 
     if [[ -n "$cmd" && -n "${ZACCU_PLUGS_TEXT_GENERATORS[$cmd]}" ]]; then
@@ -154,12 +154,14 @@ for entry in "${input_arr[@]}"; do
     local -a data_pack ts active_path copy_of_input
     data_pack=( "${(@z)entry}" )
     ts="${data_pack[1]}"
-    active_path="${(Q)data_pack[2]}"
-    copy_of_input="${(Q)data_pack[3]}"
+    convey_id="${(Q)data_pack[2]}"
+    convey_name="${(Q)data_pack[3]}"
+    active_path="${(Q)data_pack[4]}"
+    copy_of_input="${(Q)data_pack[5]}"
 
     # Additional variadic data, currently used by project discovery
     local -a ZACCU_OTHER_VARIADIC_DATA
-    ZACCU_OTHER_VARIADIC_DATA=( "${(@Q)data_pack[5,-1]}" )
+    ZACCU_OTHER_VARIADIC_DATA=( "${(@Q)data_pack[7,-1]}" )
 
     local -a command_set
     # What's enterred on command line, is to be dequoted
@@ -209,7 +211,7 @@ for entry in "${input_arr[@]}"; do
             fi
 
             # Run generator
-            -zaccu_run_generator "$ts" "$active_path" "${(@)command_set[$selected_idx,$last_idx]}"
+            -zaccu_run_generator "$ts" "$active_path" "$convey_id" "$convey_name" "${(@)command_set[$selected_idx,$last_idx]}"
 
             cmd=""
             selected_idx=0
@@ -219,7 +221,7 @@ for entry in "${input_arr[@]}"; do
 
     # Last command, without ";" at the end of it
     if [[ "$selected_idx" -ne "0" ]]; then
-        -zaccu_run_generator "$ts" "$active_path" "${(@)command_set[$selected_idx,-1]}"
+        -zaccu_run_generator "$ts" "$active_path" "$convey_id" "$convey_name" "${(@)command_set[$selected_idx,-1]}"
     fi
 done
 

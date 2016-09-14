@@ -135,7 +135,10 @@ __trackinghook() {
         variadic+=( "${(q)entries[i]}" "${(q)paths[i]}" ":${(q)marks[i]}" )
     done
 
-    print -r -- "$ts $first $second $third ${variadic[*]}" >> "${ZACCU_CONFIG_DIR}/data/input.db"
+    # Zconvey plugin integration
+    local convey_id="${(q)ZCONVEY_ID}" convey_name="${(q)ZCONVEY_NAME}"
+
+    print -r -- "$ts $convey_id $convey_name $first $second $third ${variadic[*]}" >> "${ZACCU_CONFIG_DIR}/data/input.db"
 
     [ "$ZACCU_DEBUG" = "1" ] && local t=$(( SECONDS - start_time )) && echo preexec ran ${t[1,5]}s
 }

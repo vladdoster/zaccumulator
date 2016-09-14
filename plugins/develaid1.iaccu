@@ -66,9 +66,9 @@ __accu_initial_generator_develaid1() {
 # $2 - it's "vim" or "gvim", the command that's invoked
 # $3, $4, ... - arguments passed to vim
 __accu_generator_develaid1() {
-    local ts="$1" active_path="$2" cmd="$3"
+    local ts="$1" active_path="$2" convey_id="$3" convey_name="$4" cmd="$5"
     local -a args
-    shift 3
+    shift 5
     args=( "$@" )
 
     integer max_entries="${ZACCU_CONFIG[develaid1_size]}" keep_going="${ZACCU_CONFIG[develaid1_keep_going]}" finished=0
