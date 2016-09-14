@@ -97,4 +97,83 @@ function zaccu_stdlib_decode_hyperlink() {
     return 1
 }
 
+# Puts given links in a box, i.e. into sequence of lines
+# that are limited in length. The sequence is returned
+# in reply array. The length of a link is the length of
+# its text, i.e. it doesn't include meta-data.
+#
+# $1 - box width (line length)
+# $2 - max box height (i.e. max # of lines)
+# $3 - hyperlink 1
+# $4 - hyperlink 2
+# $5 - ...
+#
+function zaccu_pack_hyperlinks_into_box() {
+    local width="$1" max_height="$2"
+    shift 2
+
+    reply=()
+    local hyp_link text new_line="" tmp pad
+    integer idx max_idx="${#}" text_len diff_len now_width=0 now_height=0
+    for (( idx=1; idx <= max_idx; idx ++ )); do
+        # The box is limited in height
+        (( now_height >= max_height )) && break
+
+        hyp_link="${@[idx]}"
+        text="${hyp_link#$'\1'*$'\2'}"
+        text_len="${#text}"
+
+        # Will hyp_link fit into this line?
+        if [ "$now_width" != "0" ]; then
+            if (( now_width + text_len + 1 <= width )); then
+                now_width+=text_len+1
+                new_line+=" $hyp_link"
+            else
+                # The line will be too long, pad it and store
+                # it into the box array without current link
+                # – leave the link for next loop run
+                pad=""
+                (( width-now_width > 0 )) && pad="${(r:width-now_width:: :)pad}"
+                # Store the line into the box array
+                reply+=( "${new_line}${pad}" )
+                now_height+=1
+                # Next line – empty
+                new_line=""
+                now_width=0
+                # Repeat processing of current hyp_link
+                idx=idx-1
+            fi
+        else
+            if (( text_len <= width )); then
+                now_width+=text_len
+                new_line+="$hyp_link"
+            else
+                # Special case: a hyper-link that does
+                # not fit even when it's alone in line
+                diff_len=$(( ${#text} - (width-2) ))
+                hyp_link="${hyp_link[1,-diff_len-1]}..."
+                # Store the truncated button into box array
+                reply+=( "${hyp_link}.." )
+                now_height+=1
+                # Next line – empty
+                new_line=""
+                now_width=0
+            fi
+        fi
+    done
+
+    # Line that wasn't filled and store wasn't triggered
+    if [[ -n "$new_line" && "$now_height" -lt "$max_height" ]]; then
+        pad=""
+        (( width-now_width > 0 )) && pad="${(r:width-now_width:: :)pad}"
+        # Store the line into the box array
+        reply+=( "${new_line}${pad}" )
+    fi
+
+    #local tmp
+    #for tmp in "${reply[@]}"; do
+    #    echo "| $tmp |" >> /tmp/reply
+    #done
+}
+
 # vim:ft=zsh
