@@ -145,7 +145,7 @@ __mytrackinghook() {
         # Quoting for data storage - not for simulation of user input
         wd="${(q)wd}"
         cmd_with_params="${(q)cmd_with_params}"
-        print -r -- "0 $wd $cmd_with_params $cmd_with_params" >> "${ZACCU_CONFIG_DIR}/data/input.db"
+        print -r -- "0 0 '' $wd $cmd_with_params $cmd_with_params" >> "${ZACCU_CONFIG_DIR}/data/input.db"
 
         current_done+=1
         [[ "$current_done" -ge "$todo" ]] && echo "${fg_bold[green]}Gathered $todo commands, exiting$reset_color" && return 0
