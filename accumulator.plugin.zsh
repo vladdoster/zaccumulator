@@ -220,7 +220,7 @@ function zaccu_get_std_button() {
 #
 function zaccu_get_button() {
     local id="${(q)1}" data1="${(q)2}" data2="${(q)3}" data3="${(q)4}" data4="${(q)5}" text="$6" handler="$7"
-    reply+=( "["$'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"$data3"$'\1'"$data4"$'\2'"${text}]" )
+    reply+=( $'\1'"$id"$'\1'"$data1"$'\1'"$data2"$'\1'"$data3"$'\1'"$data4"$'\2'"[${text}]" )
     ZACCU_PLUGS_ACTION_IDS_TO_HANDLERS[$id]="$handler"
 }
 
