@@ -151,7 +151,7 @@ function zaccu_pack_hyperlinks_into_box() {
                 # Special case: a hyper-link that does
                 # not fit even when it's alone in line
                 diff_len=$(( ${#text} - (width-2) ))
-                hyp_link="${hyp_link[1,-diff_len-1]}..."
+                hyp_link="${hyp_link[1,-diff_len-1]}"
                 # Store the truncated button into box array
                 reply+=( "${hyp_link}.." )
                 now_height+=1
