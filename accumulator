@@ -42,12 +42,14 @@ function -zaccu_run_initial_generators() {
 #
 # Requested and used is also $2 - $PWD at the time
 # when the command is being run, and $1 - time
-# stamp of that moment. Also, the general purpose
-# marks are passed around, currently with project
-# information
+# stamp of that moment. Also, in appropiate scope
+# a parameter ZACCU_OTHER_VARIADIC_DATA is available
+# for plugins, containing variable number of elements
+# read from input.db, occuring after fixed, defined
+# elements
 #
 function -zaccu_run_generator() {
-    local ts="$1" active_path="$2" marks="$3" cmd="$4"
+    local ts="$1" active_path="$2" cmd="$3"
     integer exit_codes=0
 
     if [[ -n "$cmd" && -n "${ZACCU_PLUGS_TEXT_GENERATORS[$cmd]}" ]]; then
@@ -128,6 +130,7 @@ local curcontext=":zle:$WIDGET"
 local MATCH MBEGIN MEND
 local input_db_path="$HOME/.config/accumulator/data/input.db"
 local -a input_arr
+local -a ZACCU_OTHER_VARIADIC_DATA
 
 # Load all plugin implementations
 local impl
@@ -148,12 +151,15 @@ input_arr=( "${(Oa)input_arr[@]}" )
 for entry in "${input_arr[@]}"; do
     (( (SECONDS - start_seconds) * 1000 >= limit_seconds )) && break
 
-    local -a data_pack ts active_path copy_of_input marks
+    local -a data_pack ts active_path copy_of_input
     data_pack=( "${(@z)entry}" )
     ts="${data_pack[1]}"
     active_path="${(Q)data_pack[2]}"
     copy_of_input="${(Q)data_pack[3]}"
-    marks="${(Q)data_pack[5]}"
+
+    # Additional variadic data, currently used by project discovery
+    local -a ZACCU_OTHER_VARIADIC_DATA
+    ZACCU_OTHER_VARIADIC_DATA=( "${(@Q)data_pack[5,-1]}" )
 
     local -a command_set
     # What's enterred on command line, is to be dequoted
@@ -203,7 +209,7 @@ for entry in "${input_arr[@]}"; do
             fi
 
             # Run generator
-            -zaccu_run_generator "$ts" "$active_path" "$marks" "${(@)command_set[$selected_idx,$last_idx]}"
+            -zaccu_run_generator "$ts" "$active_path" "${(@)command_set[$selected_idx,$last_idx]}"
 
             cmd=""
             selected_idx=0
@@ -213,7 +219,7 @@ for entry in "${input_arr[@]}"; do
 
     # Last command, without ";" at the end of it
     if [[ "$selected_idx" -ne "0" ]]; then
-        -zaccu_run_generator "$ts" "$active_path" "$marks" "${(@)command_set[$selected_idx,-1]}"
+        -zaccu_run_generator "$ts" "$active_path" "${(@)command_set[$selected_idx,-1]}"
     fi
 done
 

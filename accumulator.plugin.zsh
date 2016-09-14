@@ -37,8 +37,8 @@ __trackinghook() {
     setopt localtraps; trap '' INT
 
     local -F SECONDS
-    local -F start_time="$SECONDS"
     local -F start_time="$SECONDS" diff
+    local time_limit=150
 
     local first second
     first="${(q)${(q)PWD}}"
@@ -63,7 +63,7 @@ __trackinghook() {
         ts="$( date +%s )"
     fi
 
-    local proj_discovery_nparents time_limit
+    local proj_discovery_nparents
     local -a project_starters unit_starters
     zstyle -s ":accumulator:tracking" proj_discovery_nparents proj_discovery_nparents || proj_discovery_nparents=4
     zstyle -s ":accumulator:tracking" time_limit time_limit || time_limit="150"
@@ -86,7 +86,7 @@ __trackinghook() {
         (( proj_discovery_nparents = proj_discovery_nparents - 1 ))
 
         for ps in "${project_starters[@]}"; do
-            (( (diff=(SECONDS-start_time)*1000) > time_limit )) && echo "${fg_bold[red]}TRACKING ABORTED, TOO SLOW (${diff%.*}ms)${reset_color}" && break 2
+            (( (diff=(SECONDS-start_time)*1000) > time_limit )) && echo "${fg_bold[red]}TRACKING ABORTED, TOO SLOW (${diff%.*}ms / $proj_discovery_nparents)${reset_color}" && break 2
             result=0
             if [ "${ps/\*/}" != "$ps" ]; then
                 tmp=( $look_in/$~ps(NY1) )
