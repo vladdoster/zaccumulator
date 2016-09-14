@@ -105,7 +105,7 @@ __accu_generator_vim1() {
                 reply[4]=""
             fi
 
-            ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"$reply[1] ${reply[2]} ${reply[3]}${reply[4]}"$'\n'
+            ZACCU_OUTPUT_DOCUMENT_SECTIONS[vim1]+=$'\t'"${reply[1]} ${reply[2]} ${reply[3]}${reply[4]}"$'\n'
         fi
     done
 
