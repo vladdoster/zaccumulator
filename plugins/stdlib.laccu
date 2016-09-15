@@ -108,7 +108,7 @@ function zaccu_stdlib_decode_hyperlink() {
 # $4 - hyperlink 2
 # $5 - ...
 #
-function zaccu_pack_hyperlinks_into_box() {
+function zaccu_stdlib_pack_hyperlinks_into_box() {
     local width="$1" max_height="$2"
     shift 2
 
