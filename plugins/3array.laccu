@@ -1,0 +1,153 @@
+#
+# Library file (*.laccu)
+#
+# Functions for 3 dimensional arrays.
+# First dimension (rectangles) of such array is dynamic,
+# second and third sizes are defined (separately).
+#
+# Can look at the arrays as at C multi-dimensional arrays,
+# with the exception that first dimension can grow.
+#
+
+#
+# Creates 3 dimensional array
+#
+# The $1 array will be filled with $2-many copies of
+# $3-many copies of $4-long '' sequences (empty strings).
+# A sentinel will be put after end of the array.
+#
+# Corresponding C array would be: multitype name[$2][$3][$4];
+# Plus the sentinel.
+#
+# $1 - name of outer scope variable to be initialized
+# $2 - number, first dimension
+# $3 - number, second dimension
+# $4 - number, third dimension
+#
+function zaccu_3arr_format() {
+    local name="$1" rects="$2" rows="$3" columns="$4"
+
+    # Set to size 0
+    : ${(PA0)name::=}
+
+    # Set to desired size increased by 1 - a sentinel
+    # at array's end, and a quick way to fill with ''
+    local resize="${name}[$(( $rects * $rows * $columns + 1 ))]"
+    : ${(PA)resize::=IM_AFTER_END_OF_ARRAY}
+}
+
+#
+# The array stores multiple rectangles: arrays of fixed
+# length (or arrays of arrays – thus the rectangles –
+# each of fixed length).
+#
+# There is a function that returns copy of selected row
+# of selected rect. For maximum performance, one can
+# ask only for indexes of the wanted row, with this
+# function - and then index the array like so:
+#   print -rl -- "${(@)array[start_idx,end_idx]}"
+#
+# $1 - number of requested rect (first index)
+# $2 - number of requested row (second index)
+# $3 - height of the rect (second dimension)
+# $4 - size of row (third dimension)
+#
+# $reply[1] - start idx of the row
+# $reply[2] - end idx of the row
+#
+function zaccu_3arr_get_row_indexes() {
+    integer rect_nr="$1" row_nr="$2" rect_height="$3" row_size="$4"
+
+    reply=()
+    reply[1]=$(( (rect_nr-1) * rect_height * row_size + (row_nr-1)*row_size + 1 ))
+    reply[2]=$(( (rect_nr-1) * rect_height * row_size + row_nr*row_size ))
+    return 0
+}
+
+#
+# Returns copy of requested row
+#
+# $1 - name of outer scope variable that holds the array
+# $2 - number of requested rect (first index)
+# $3 - number of requested row (second index)
+# $4 - height of the rect (second dimension)
+# $5 - size of row (third dimension)
+#
+#
+# $reply - array containing the requested row
+#
+function zaccu_3arr_get_row() {
+    local name="$1"
+    integer rect_nr="$2" row_nr="$3" rect_height="$4" row_size="$5"
+
+    integer start_idx=$(( (rect_nr-1) * rect_height * row_size + (row_nr-1)*row_size + 1 ))
+    integer end_idx=$(( (rect_nr-1) * rect_height * row_size + row_nr*row_size ))
+
+    local access="${name}[$start_idx,$end_idx]"
+    reply=( "${(PA@)access}" )
+}
+
+#
+# Returns given element
+#
+# $1 - name of outer scope variable that holds the array
+# $2 - number of requested rect (first index)
+# $3 - number of requested row (second index)
+# $4 - number of requested column (third index)
+# $5 - height of the rect (second dimension)
+# $6 - size of row (third dimension)
+#
+# $REPLY - the requested element
+#
+function zaccu_3arr_get_element() {
+    local name="$1"
+    integer rect_nr="$2" row_nr="$3" col_nr="$4" rect_height="$5" row_size="$6"
+    integer idx=$(( (rect_nr-1) * rect_height * row_size + (row_nr-1)*row_size + col_nr ))
+    local access="${name}[$idx]"
+    REPLY="${(PA)access}"
+}
+
+#
+# Returns index of given element
+#
+# $1 - name of outer scope variable that holds the array
+# $2 - number of requested rect (first index)
+# $3 - number of requested row (second index)
+# $4 - number of requested column (third index)
+# $5 - height of the rect (second dimension)
+# $6 - size of row (third dimension)
+#
+# $REPLY - the requested index
+#
+function zaccu_3arr_get_element_index() {
+    local name="$1"
+    integer rect_nr="$2" row_nr="$3" col_nr="$4" rect_height="$5" row_size="$6"
+    REPLY=$(( (rect_nr-1) * rect_height * row_size + (row_nr-1)*row_size + col_nr ))
+}
+
+#
+# Adds rectangle (main index, the one that's dynamic)
+# to the array
+#
+# $1 - name of outer scope variable that holds the array
+# $2 - height of the rect (second dimension)
+# $3 - size of row (third dimension)
+# $4 - current number rectangles in the array
+#
+function zaccu_3arr_add_rect() {
+    local name="$1"
+    integer rect_height="$2" row_size="$3" rect_count="$4"
+
+    integer idx=$(( rect_count * rect_height * row_size + 1 ))
+
+    # Remove sentinel
+    local access="${name}[$idx]"
+    : "${(PA)access::=}"
+
+    # Set new sentinel and thus resize
+    idx+=rect_height*row_size
+    access="${name}[$idx]"
+    : ${(PA)access::=IM_AFTER_END_OF_ARRAY}
+}
+
+# vim:ft=zsh
