@@ -1,0 +1,137 @@
+#
+# Library file (*.laccu)
+#
+# Functions for 2 dimensional arrays.
+# First dimension (rows) of such array is dynamic, second
+# (columns) is defined.
+#
+# Can look at the arrays as at C multi-dimensional arrays,
+# with the exception that first dimension can grow.
+#
+
+#
+# Creates 2 dimensional array
+#
+# The $1 array will be filled with $2-many copies of
+# $3-long '' sequences (empty strings). A sentinel will
+# be put after end of the array.
+#
+# Corresponding C array would be: multitype name[$1][$2];
+# Plus the sentinel.
+#
+# $1 - name of outer scope variable to be initialized
+# $2 - number, first dimension
+# $3 - number, second dimension
+#
+function zaccu_2arr_format() {
+    local name="$1" rows="$2" columns="$3"
+
+    # Set to size 0
+    : ${(PA0)name::=}
+
+    # Set to desired size increased by 1 - a sentinel
+    # at array's end, and a quick way to fill with ''
+    local resize="${name}[$(( $rows * $columns + 1 ))]"
+    : ${(PA)resize::=IM_AFTER_END_OF_ARRAY}
+}
+
+#
+# The array stores multiple rows: arrays of fixed length
+# There is a function that returns copy of the row. For
+# maximum performance, one can ask only for indexes of
+# the wanted row, with this function - and then index
+# the array like so:
+#   print -rl -- "${(@)array[start_idx,end_idx]}"
+#
+# $1 - number of row that is requested (so, 1-based)
+# $2 - size of the row
+#
+# $reply[1] - start idx of the row
+# $reply[2] - end idx of the row
+#
+function zaccu_2arr_get_row_indexes() {
+    integer row_nr="$1" row_size="$2"
+
+    reply=()
+    reply[1]=$(( (row_nr-1)*row_size + 1 ))
+    reply[2]=$(( row_nr*row_size ))
+    return 0
+}
+
+#
+# Returns copy of requested row
+#
+# $1 - name of outer scope variable that holds the array
+# $2 - number of row that is requested (so, 1-based)
+# $3 - size of single row
+#
+# $reply - array containing the requested row
+#
+function zaccu_2arr_get_row() {
+    local name="$1"
+    integer row_nr="$2" row_size="$3"
+
+    integer start_idx=$(( (row_nr-1)*row_size + 1 ))
+    integer end_idx=$(( row_nr*row_size ))
+
+    local access="${name}[$start_idx,$end_idx]"
+    reply=( "${(PA@)access}" )
+}
+
+#
+# Returns given element
+#
+# $1 - name of outer scope variable that holds the array
+# $2 - number of row that is requested (so, 1-based)
+# $3 - number of column that is requested (1-based)
+# $4 - size of single row, set when formatting the array
+#
+# $REPLY - the requested element
+#
+function zaccu_2arr_get_element() {
+    local name="$1"
+    integer row_nr="$2" col_nr="$3" row_size="$4"
+    integer idx=$(( (row_nr-1)*row_size + col_nr ))
+    local access="${name}[$idx]"
+    REPLY="${(PA)access}"
+}
+
+#
+# Returns index of given element
+#
+# $1 - name of outer scope variable that holds the array
+# $2 - number of row that is requested (so, 1-based)
+# $3 - number of column that is requested (1-based)
+# $4 - size of single row, set when formatting the array
+#
+# $REPLY - the requested index
+#
+function zaccu_2arr_get_element_index() {
+    local name="$1"
+    integer row_nr="$2" col_nr="$3" row_size="$4"
+    REPLY=$(( (row_nr-1)*row_size + col_nr ))
+}
+
+# Adds row to the array
+#
+# $1 - name of outer scope variable that holds the array
+# $2 - size of single row, set when formatting the array
+# $3 - current number of rows in the array
+#
+function zaccu_2arr_add_row() {
+    local name="$1"
+    integer row_size="$2" row_count="$3"
+
+    integer idx=$(( row_count * row_size + 1 ))
+
+    # Remove sentinel
+    local access="${name}[$idx]"
+    : "${(PA)access::=}"
+
+    # Set new sentinel and thus resize
+    idx+=row_size
+    access="${name}[$idx]"
+    : ${(PA)access::=IM_AFTER_END_OF_ARRAY}
+}
+
+# vim:ft=zsh
