@@ -16,7 +16,7 @@
 # $3-long '' sequences (empty strings). A sentinel will
 # be put after end of the array.
 #
-# Corresponding C array would be: multitype name[$1][$2];
+# Corresponding C array would be: multitype name[$2][$3];
 # Plus the sentinel.
 #
 # $1 - name of outer scope variable to be initialized
@@ -112,6 +112,7 @@ function zaccu_2arr_get_element_index() {
     REPLY=$(( (row_nr-1)*row_size + col_nr ))
 }
 
+#
 # Adds row to the array
 #
 # $1 - name of outer scope variable that holds the array
