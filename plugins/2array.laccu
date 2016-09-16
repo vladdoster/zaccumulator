@@ -38,7 +38,7 @@ function zaccu_2arr_format() {
 #
 # The array stores multiple rows: arrays of fixed length
 # There is a function that returns copy of the row. For
-# maximum performance, one can ask only for indexes of
+# maximum performance, one can ask only for indices of
 # the wanted row, with this function - and then index
 # the array like so:
 #   print -rl -- "${(@)array[start_idx,end_idx]}"
@@ -49,7 +49,7 @@ function zaccu_2arr_format() {
 # $reply[1] - start idx of the row
 # $reply[2] - end idx of the row
 #
-function zaccu_2arr_get_row_indexes() {
+function zaccu_2arr_get_row_indices() {
     integer row_nr="$1" row_size="$2"
 
     reply=()

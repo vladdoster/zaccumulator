@@ -43,7 +43,7 @@ function zaccu_3arr_format() {
 #
 # There is a function that returns copy of selected row
 # of selected rect. For maximum performance, one can
-# ask only for indexes of the wanted row, with this
+# ask only for indices of the wanted row, with this
 # function - and then index the array like so:
 #   print -rl -- "${(@)array[start_idx,end_idx]}"
 #
@@ -55,7 +55,7 @@ function zaccu_3arr_format() {
 # $reply[1] - start idx of the row
 # $reply[2] - end idx of the row
 #
-function zaccu_3arr_get_row_indexes() {
+function zaccu_3arr_get_row_indices() {
     integer rect_nr="$1" row_nr="$2" rect_height="$3" row_size="$4"
 
     reply=()
