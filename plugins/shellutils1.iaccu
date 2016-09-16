@@ -103,11 +103,11 @@ __accu_generator_shellutils1() {
 
     # There are extreme cases where this might
     # be the same for two different paths
-    local check="${(j:,:)opts}.${(j:,:)paths}"
+    local check="${cmd}.${(j:,:)opts}.${(j:,:)paths}"
 
-    if [ "$__accu_shellutils1_opts_paths_occured[$check]" != "1" ]; then
+    if [ "$__accu_shellutils1_cmd_opts_paths_occured[$check]" != "1" ]; then
         __accu_shellutils1_was_content=1
-        __accu_shellutils1_opts_paths_occured[$check]="1"
+        __accu_shellutils1_cmd_opts_paths_occured[$check]="1"
 
         # Concatenate all paths and options in a (z)-splittable way
         local opts_concat="${(j: :)${(q)opts[@]}}"
@@ -162,7 +162,7 @@ __accu_generator_shellutils1() {
 #
 
 __accu_final_generator_shellutils1() {
-    __accu_shellutils1_opts_paths_occured=()
+    __accu_shellutils1_cmd_opts_paths_occured=()
     __accu_shellutils1_count=0
     __accu_shellutils1_kg_count=0
 
@@ -274,9 +274,9 @@ __accu_action_backup_shellutils1() {
 # Helper variables
 #
 
-# Detects if a cp command already occured (checks
-# for the same options and paths)
-typeset -gA __accu_shellutils1_opts_paths_occured
+# Detects if a command already occured (checks
+# for the same command, options and paths)
+typeset -gA __accu_shellutils1_cmd_opts_paths_occured
 
 # Detects whether any content occured
 integer -g __accu_shellutils1_was_content
