@@ -40,7 +40,7 @@ __trackinghook() {
     local -F start_time="$SECONDS" diff
     local time_limit=150
 
-    local first second
+    local first second third
     first="${(q)${(q)PWD}}"
     second="${(q)1}"
     third="${(q)2}"
