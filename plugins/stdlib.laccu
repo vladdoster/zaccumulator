@@ -6,16 +6,17 @@
 
 # Available colors to embed in generated text
 # ACC - accumulator color
+# \31 is octal value 25 - EM End of medium
 ACC_RED=$'\7'
-ACC_RED_E=$'\25'
+ACC_RED_E=$'\31'
 ACC_GREEN=$'\3'
-ACC_GREEN_E=$'\25'
+ACC_GREEN_E=$'\31'
 ACC_YELLOW=$'\4'
-ACC_YELLOW_E=$'\25'
+ACC_YELLOW_E=$'\31'
 ACC_MAGENTA=$'\5'
-ACC_MAGENTA_E=$'\25'
+ACC_MAGENTA_E=$'\31'
 ACC_CYAN=$'\6'
-ACC_CYAN_E=$'\25'
+ACC_CYAN_E=$'\31'
 
 # Resolves absolute path from current working directory and file path
 #
