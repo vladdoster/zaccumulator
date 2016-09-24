@@ -276,7 +276,6 @@ if [[ -z "$ZACCULIST_REMEMBER_STATE" || "$ZACCULIST_REMEMBER_STATE" -eq 0 || "$Z
     ZACCULIST_TEXT_OFFSET=0
     ZACCULIST_IS_UNIQ_MODE=0
     ZACCULIST_CURRENT_SEGMENT=1 # This variable is responsible for horizontal indexing
-    typeset -gA ZACCULIST_ACTIVE_SEGMENTS
     ZACCULIST_ACTIVE_SEGMENTS=()
 
     # Zero - because it isn't known, unless we
