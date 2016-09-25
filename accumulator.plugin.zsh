@@ -86,7 +86,7 @@ __trackinghook() {
         (( proj_discovery_nparents = proj_discovery_nparents - 1 ))
 
         for ps in "${project_starters[@]}"; do
-            (( (diff=(SECONDS-start_time)*1000) > time_limit )) && echo "${fg_bold[red]}TRACKING ABORTED, TOO SLOW (${diff%.*}ms / $proj_discovery_nparents)${reset_color}" && break 2
+            (( (diff=(SECONDS-start_time)*1000) > time_limit )) && echo "${fg_bold[red]}TRACKING ABORTED, TOO SLOW (${diff%.*}ms / $proj_discovery_nparents / $ps )${reset_color}" && break 2
             result=0
             if [ "${ps/\*/}" != "$ps" ]; then
                 tmp=( $look_in/$~ps(NY1) )
