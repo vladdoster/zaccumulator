@@ -69,7 +69,7 @@ __trackinghook() {
     zstyle -s ":accumulator:tracking" time_limit time_limit || time_limit="150"
     zstyle -a ":accumulator:tracking" project_starters project_starters \
         || project_starters=( .git .hg Makefile CMakeLists.txt configure SConstruct \*.pro \*.xcodeproj \*.cbp \*.kateproject \*.plugin.zsh )
-    zstyle -a ":accumulator:tracking" unit_starters unit_starters_str || unit_starters=( Makefile CMakeLists.txt \*.pro )
+    zstyle -a ":accumulator:tracking" unit_starters unit_starters || unit_starters=( Makefile CMakeLists.txt \*.pro )
 
     # A map of possible project files into compact mark
     local -A pfile_to_mark
