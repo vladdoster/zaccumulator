@@ -179,7 +179,7 @@ _zacculist_mark_current_segment_in_current_element() {
         [[ -z "$ZACCULIST_SEARCH_BUFFER" && "${ZACCULIST_NONSELECTABLE_ELEMENTS[(r)$ZACCULIST_CURRENT_IDX]}" = "$ZACCULIST_CURRENT_IDX" ]] && return
 
         # There will be no colorifying for current element
-        integer ZACCULIST_CURRENT_PAGE_IDX=$(( (ZACCULIST_CURRENT_IDX-1)%page_height+1 ))
+        integer ZACCULIST_CURRENT_PAGE_IDX=$(( ZACCULIST_CURRENT_IDX - ZACCULIST_FROM_WHAT_IDX_LIST_IS_SHOWN + 1 )) 
         local element="$list[ZACCULIST_CURRENT_IDX]"
         local output=""
 
@@ -425,7 +425,7 @@ while (( 1 )); do
         disp_list2=( "${disp_list2[@]//$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\2'/}" )
 
         # Output colored list
-        zaccu-list-draw "$(( (ZACCULIST_CURRENT_IDX-1) % page_height + 1 ))" \
+        zaccu-list-draw "$(( ZACCULIST_CURRENT_IDX - ZACCULIST_FROM_WHAT_IDX_LIST_IS_SHOWN + 1 ))" \
             "$page_height" "$page_width" 1 2 "$ZACCULIST_TEXT_OFFSET" "$wname_main" \
             "$disp_list2[@]"
     else
@@ -490,7 +490,7 @@ while (( 1 )); do
         disp_list2=( "${disp_list2[@]//$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\1'[^$'\1']#$'\2'/}" )
 
         # Output the list
-        zaccu-list-draw "$(( (ZACCULIST_CURRENT_IDX-1) % page_height + 1 ))" \
+        zaccu-list-draw "$(( ZACCULIST_CURRENT_IDX - ZACCULIST_FROM_WHAT_IDX_LIST_IS_SHOWN + 1 ))" \
             "$page_height" "$page_width" 1 2 "$ZACCULIST_TEXT_OFFSET" "$wname_main" \
             "$disp_list2[@]"
     fi
