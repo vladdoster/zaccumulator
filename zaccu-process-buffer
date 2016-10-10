@@ -66,11 +66,9 @@ for (( i=1; i<=nwords; i++ )); do
     ZACCU_PB_SPACES[i]="$MATCH"
 
     # Remove the word
-    MATCH=""
-    buf="${buf#(#m)$word}"
-
-    # If shell word not found, return. This shoudln't happen
-    [ -z "$MATCH" ] && return 1
+    wordlen="${#word}"
+    [[ "${buf[1,wordlen]}" != "$word" ]] && return 1 # should not happen unless bug in (z)
+    buf="${buf[wordlen+1,-1]}"
 
     # Spaces point to previous shell word
     # Visual cursor right after spaces (-ge) -> not enough to select previous word (-gt required)
